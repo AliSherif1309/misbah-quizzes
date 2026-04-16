@@ -1,317 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grade 6 English Quiz - Mr. Ali Misbah</title>
-  
-  <!-- Import a beautiful, modern, rounded font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Import a Confetti animation library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <style>
-    /* Fun, modern app styling */
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      padding-bottom: 120px; 
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    /* HEADER WITH LOGOS */
-    .header {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border-top: 8px solid #3b82f6;
-    }
-    .logos-container {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    /* Logo sizing */
-    .logo {
-      height: 70px;
-      object-fit: contain;
-    }
-    .header-text { text-align: center; }
-    .header h1 { margin: 0; color: #1e293b; font-size: 2rem; font-weight: 700;}
-    .header p { margin: 5px 0 0 0; font-size: 1.1rem; color: #3b82f6; font-weight: 600; }
-
-    /* PROGRESS BAR */
-    .progress-container {
-      width: 100%;
-      background: #e2e8f0;
-      border-radius: 20px;
-      height: 12px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      background: #10b981;
-      width: 0%; /* Starts at 0 */
-      transition: width 0.5s ease;
-    }
-
-    /* QUESTION CARDS WITH HOVER ANIMATIONS */
-    .question-card {
-      background: white;
-      padding: 25px;
-      border-radius: 16px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .question-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 20px rgba(0,0,0,0.1);
-    }
-    .question-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #1e293b;
-    }
-
-    /* ANSWER BUTTONS WITH PRESS ANIMATIONS */
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .option-btn {
-      padding: 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      background: #f8fafc;
-      font-size: 1rem;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      color: #475569;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .option-btn:hover:not(:disabled) {
-      background: #e2e8f0;
-      border-color: #cbd5e1;
-    }
-    .option-btn:active:not(:disabled) {
-      transform: scale(0.98); /* Satisfying click press effect */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6 English - Mr. Ali Misbah</title>
     
-    .option-btn:disabled { cursor: not-allowed; }
-    
-    .correct {
-      background: #d1fae5 !important;
-      border-color: #10b981 !important;
-      color: #065f46 !important;
-    }
-    .wrong {
-      background: #fee2e2 !important;
-      border-color: #ef4444 !important;
-      color: #991b1b !important;
-    }
+    <!-- Fonts & Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- jsPDF Library for Certificates -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    /* SCORE BOARD */
-    .score-board {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b;
-      color: white;
-      padding: 15px 40px;
-      border-radius: 50px;
-      font-size: 1.3rem;
-      font-weight: 700;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      z-index: 1000;
-      transition: background 0.5s ease;
-    }
-  </style>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --error: #ef4444;
+            --dark: #1e293b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0; padding: 20px; color: #333;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 700px; }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 10px solid var(--primary);
+        }
+
+        #quiz-screen, #result-screen { display: none; }
+
+        /* Logos Section */
+        .logos-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo { height: 60px; object-fit: contain; }
+
+        input {
+            width: 85%; padding: 15px; margin: 25px 0;
+            border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 1.2rem; text-align: center; font-family: 'Poppins';
+        }
+
+        .btn {
+            background: var(--primary); color: white; border: none;
+            padding: 16px 40px; border-radius: 12px; font-size: 1.1rem;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            text-decoration: none; display: inline-block;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
+
+        /* Quiz UI */
+        .progress-container {
+            width: 100%; background: #e2e8f0; height: 12px;
+            border-radius: 10px; margin: 25px 0; overflow: hidden;
+        }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: 0.4s; }
+
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; text-align: left; line-height: 1.5; }
+        
+        .options-grid { display: grid; gap: 12px; }
+        .option {
+            padding: 18px; border: 2px solid #e2e8f0; border-radius: 14px;
+            text-align: left; cursor: pointer; font-weight: 600; transition: 0.2s;
+            background: #f8fafc; display: flex; justify-content: space-between;
+        }
+        .option:hover { background: #f1f5f9; border-color: var(--primary); }
+        .correct { background: #d1fae5 !important; border-color: var(--success) !important; color: #065f46; }
+        .wrong { background: #fee2e2 !important; border-color: var(--error) !important; color: #991b1b; }
+
+        /* Result UI */
+        .medal-icon { font-size: 90px; margin-bottom: 10px; animation: bounce 1s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        
+        .rank-badge { font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        .cert-btn { background: #6366f1; margin-top: 25px; }
+
+        /* Hidden elements for PDF processing */
+        #signature-img { display: none; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header with 2 Logos -->
-    <div class="header">
-      <div class="logos-container">
-        <!-- LOGO 1 (Left) -->
-        <img src="neu-logo.png" alt="Neu Academy Logo" class="logo">
-        <!-- LOGO 2 (Right) -->
-        <img src="lights-logo.png" alt="Lights Logo" class="logo" id="logo2">
-      </div>
-      
-      <div class="header-text">
-        <h1>Grade 6 English Quiz</h1>
-        <p>👨‍🏫 Teacher: Mr. Ali Misbah</p>
-      </div>
+<div class="container">
 
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-bar" id="progress-bar"></div>
-      </div>
+    <!-- SCREEN 1: WELCOME -->
+    <div id="welcome-screen" class="card">
+        <div class="logos-container">
+            <img src="neu-logo.png" alt="Neu Academy Logo" class="logo" id="logo-neu">
+            <img src="lights-logo.png" alt="Lights Logo" class="logo" id="logo-lights">
+        </div>
+        <h1>Grade 6 English Quiz</h1>
+        <p>Teacher: <strong>Mr. Ali Misbah</strong></p>
+        <input type="text" id="student-name" placeholder="Enter Your Full Name">
+        <br>
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
     </div>
 
-    <!-- Questions go here -->
-    <div id="quiz-container"></div>
-  </div>
+    <!-- SCREEN 2: QUIZ -->
+    <div id="quiz-screen" class="card">
+        <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+        <div id="question-number" style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">Question 1</div>
+        <div class="question-text" id="question-text">Loading...</div>
+        <div class="options-grid" id="options-grid"></div>
+    </div>
 
-  <!-- Sticky Score -->
-  <div class="score-board" id="score-board">
-    Score: 0 / 0
-  </div>
+    <!-- SCREEN 3: RESULTS -->
+    <div id="result-screen" class="card">
+        <div class="medal-icon" id="medal-slot">🏆</div>
+        <div class="rank-badge" id="rank-slot">Rank: Grammar King</div>
+        <h2 id="final-score-text">You scored 5/5</h2>
+        <p>An amazing performance! Download your certificate below.</p>
+        <button class="btn cert-btn" onclick="downloadCertificate()">📜 Download My Certificate</button>
+    </div>
 
-  <script>
-    // ==========================================
-    // GRADE 6 QUESTIONS
-    // ==========================================
-    const quizData =[
-      {
-        question: "1. Which word in the following sentence is an adjective? 'The heavy rain caused flooding in the city.'",
-        options: ["flooding", "heavy", "caused", "city"],
-        correctIndex: 1
-      },
-      {
-        question: "2. Choose the correct spelling:",
-        options:["Accomodation", "Acommodation", "Accommodation", "Acomodation"],
-        correctIndex: 2
-      },
-      {
-        question: "3. What is the past tense of the verb 'to catch'?",
-        options: ["Catched", "Caught", "Catching", "Cought"],
-        correctIndex: 1
-      },
-      {
-        question: "4. Identify the synonym for the word 'Enormous':",
-        options:["Tiny", "Average", "Huge", "Weak"],
-        correctIndex: 2
-      },
-      {
-        question: "5. 'She was reading a book ___ her brother was playing outside.' Which conjunction fits best?",
-        options:["but", "or", "while", "because"],
-        correctIndex: 2
-      }
+    <!-- Hidden signature image for PDF -->
+    <img src="misbah-signature.png" id="signature-img">
+
+</div>
+
+<!-- Audio Assets -->
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+<audio id="snd-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+<script>
+    const { jsPDF } = window.jspdf;
+
+    const quizData = [
+        { q: "Which of the following is an abstract noun?", a: ["Table", "Apple", "Happiness", "Teacher"], c: 2 },
+        { q: "Identify the pronoun in this sentence: 'He went to the park.'", a: ["Went", "Park", "He", "To"], c: 2 },
+        { q: "What is the plural of 'Child'?", a: ["Childs", "Childrens", "Children", "Childes"], c: 2 },
+        { q: "Choose the correct preposition: 'The book is ___ the table.'", a: ["On", "In", "Between", "Underneath"], c: 0 },
+        { q: "Identify the verb: 'The cat slept peacefully.'", a: ["Cat", "Peacefully", "Slept", "The"], c: 2 }
     ];
 
-    const quizContainer = document.getElementById('quiz-container');
-    const scoreBoard = document.getElementById('score-board');
-    const progressBar = document.getElementById('progress-bar');
-    
+    let currentQ = 0;
     let score = 0;
-    let answeredQuestions = 0;
+    let studentName = "";
 
-    // Generate Quiz
-    quizData.forEach((item, questionIndex) => {
-      const card = document.createElement('div');
-      card.className = 'question-card';
+    function startQuiz() {
+        const nameInput = document.getElementById('student-name').value.trim();
+        if (nameInput === "") return alert("Please enter your name!");
+        studentName = nameInput;
+        document.getElementById('welcome-screen').style.display = "none";
+        document.getElementById('quiz-screen').style.display = "block";
+        loadQuestion();
+    }
 
-      const questionTitle = document.createElement('div');
-      questionTitle.className = 'question-title';
-      questionTitle.innerText = item.question;
-      card.appendChild(questionTitle);
-
-      const optionsGrid = document.createElement('div');
-      optionsGrid.className = 'options-grid';
-
-      item.options.forEach((optionText, optionIndex) => {
-        const button = document.createElement('button');
-        button.className = 'option-btn';
+    function loadQuestion() {
+        const q = quizData[currentQ];
+        document.getElementById('question-number').innerText = `Question ${currentQ + 1} of ${quizData.length}`;
+        document.getElementById('question-text').innerText = q.q;
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = "";
         
-        // Use span so we can inject an emoji icon on the right side
-        button.innerHTML = `<span>${optionText}</span> <span class="icon"></span>`;
+        q.a.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerHTML = `<span>${opt}</span><span class="icon"></span>`;
+            div.onclick = () => checkAnswer(i, div);
+            grid.appendChild(div);
+        });
         
-        button.onclick = () => handleAnswerClick(button, optionIndex, item.correctIndex, optionsGrid);
-        optionsGrid.appendChild(button);
-      });
+        document.getElementById('progress-bar').style.width = (currentQ / quizData.length * 100) + "%";
+    }
 
-      card.appendChild(optionsGrid);
-      quizContainer.appendChild(card);
-    });
+    function checkAnswer(idx, el) {
+        const correct = quizData[currentQ].c;
+        const options = document.querySelectorAll('.option');
+        options.forEach(o => o.style.pointerEvents = "none");
 
-    updateScoreDisplay();
-
-    function handleAnswerClick(clickedButton, selectedIndex, correctIndex, optionsGrid) {
-      const allButtons = optionsGrid.querySelectorAll('.option-btn');
-      
-      allButtons.forEach((btn, idx) => {
-        btn.disabled = true;
-        const iconSpan = btn.querySelector('.icon');
-        
-        // Highlight correct answer automatically
-        if (idx === correctIndex) {
-          btn.classList.add('correct');
-          iconSpan.innerText = "✅"; 
+        if (idx === correct) {
+            score++;
+            el.classList.add('correct');
+            el.querySelector('.icon').innerText = "✅";
+            document.getElementById('snd-correct').play();
+        } else {
+            el.classList.add('wrong');
+            el.querySelector('.icon').innerText = "❌";
+            options[correct].classList.add('correct');
+            document.getElementById('snd-wrong').play();
         }
-      });
 
-      if (selectedIndex === correctIndex) {
-        score++;
-      } else {
-        clickedButton.classList.add('wrong');
-        clickedButton.querySelector('.icon').innerText = "❌";
-      }
-
-      answeredQuestions++;
-      updateProgress();
-      updateScoreDisplay();
+        setTimeout(() => {
+            currentQ++;
+            if (currentQ < quizData.length) loadQuestion();
+            else showResults();
+        }, 1500);
     }
 
-    function updateProgress() {
-      // Calculate percentage for progress bar
-      const percentage = (answeredQuestions / quizData.length) * 100;
-      progressBar.style.width = percentage + "%";
-    }
-
-    function updateScoreDisplay() {
-      scoreBoard.innerText = `Score: ${score} / ${quizData.length}`;
-      
-      // When all questions are answered!
-      if (answeredQuestions === quizData.length) {
-        scoreBoard.innerHTML = `Final Score: ${score} / ${quizData.length} 🌟`;
-        scoreBoard.style.background = "#10b981"; // Turn score green
+    function showResults() {
+        document.getElementById('quiz-screen').style.display = "none";
+        document.getElementById('result-screen').style.display = "block";
         
-        // SHOOT CONFETTI!
-        shootConfetti();
-      }
+        const percent = (score / quizData.length) * 100;
+        let rank = ""; let medal = "";
+
+        if (percent === 100) { rank = "Grammar King 👑"; medal = "🏆"; }
+        else if (percent >= 80) { rank = "English Expert 🥇"; medal = "🥇"; }
+        else if (percent >= 60) { rank = "Rising Star 🥈"; medal = "🥈"; }
+        else { rank = "Learner 📚"; medal = "🥉"; }
+
+        document.getElementById('medal-slot').innerText = medal;
+        document.getElementById('rank-slot').innerText = rank;
+        document.getElementById('final-score-text').innerText = `You scored ${score} out of ${quizData.length}`;
+        
+        document.getElementById('snd-win').play();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
 
-    function shootConfetti() {
-      var duration = 3 * 1000;
-      var animationEnd = Date.now() + duration;
-      var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+    function downloadCertificate() {
+        const doc = new jsPDF({ orientation: 'landscape' });
+        const neuLogo = document.getElementById('logo-neu');
+        const lightsLogo = document.getElementById('logo-lights');
+        const signImg = document.getElementById('signature-img');
 
-      function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+        // 1. Draw Border
+        doc.setDrawColor(59, 130, 246);
+        doc.setLineWidth(4);
+        doc.rect(10, 10, 277, 190); 
 
-      var interval = setInterval(function() {
-        var timeLeft = animationEnd - Date.now();
-        if (timeLeft <= 0) { return clearInterval(interval); }
-        var particleCount = 50 * (timeLeft / duration);
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-      }, 250);
+        // 2. Add Logos to Certificate
+        try {
+            doc.addImage(neuLogo, 'PNG', 20, 20, 40, 20);
+            doc.addImage(lightsLogo, 'PNG', 230, 20, 40, 20);
+        } catch(e) { console.log("Logos not loaded yet"); }
+
+        // 3. Certificate Text
+        doc.setTextColor(30, 41, 59);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(35);
+        doc.text("CERTIFICATE OF ACHIEVEMENT", 148, 60, { align: "center" });
+        
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "normal");
+        doc.text("This is to certify that", 148, 85, { align: "center" });
+        
+        doc.setFontSize(32);
+        doc.setTextColor(59, 130, 246);
+        doc.text(studentName.toUpperCase(), 148, 110, { align: "center" });
+        
+        doc.setTextColor(30, 41, 59);
+        doc.setFontSize(18);
+        doc.text(`Successfully completed the Grade 6 English Assessment`, 148, 135, { align: "center" });
+        doc.text(`Final Result: ${score} / ${quizData.length}`, 148, 148, { align: "center" });
+        
+        // 4. Add Signature Image
+        try {
+            doc.addImage(signImg, 'PNG', 118, 155, 60, 20);
+        } catch(e) { console.log("Signature image not found"); }
+
+        doc.setFontSize(14);
+        doc.text("__________________________", 148, 175, { align: "center" });
+        doc.text("Mr. Ali Misbah", 148, 182, { align: "center" });
+        doc.text("English Teacher", 148, 188, { align: "center" });
+
+        doc.save(`${studentName}_English_Certificate.pdf`);
     }
-  </script>
+</script>
+
 </body>
 </html>
