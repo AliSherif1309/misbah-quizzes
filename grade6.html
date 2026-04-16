@@ -1,561 +1,631 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade 6 English - Articles & Question Tags | Mr. Ali Misbah</title>
-    
-    <!-- Fonts & Libraries -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Grade 6 English Quiz - Articles & Question Tags | Mr. Ali Misbah</title>
+  
+  <!-- Google Fonts: Poppins for modern rounded look -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Canvas Confetti Library for celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.css"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --success: #10b981;
-            --error: #ef4444;
-            --dark: #1e293b;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            margin: 0; 
-            padding: 20px; 
-            color: #333;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #eef2f9 0%, #d9e4f5 100%);
+      color: #1e293b;
+      margin: 0;
+      padding: 24px 20px;
+      padding-bottom: 110px;
+    }
 
-        .container { width: 100%; max-width: 800px; }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+    }
 
-        .card {
-            background: white;
-            padding: 30px 32px;
-            border-radius: 32px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.12);
-            text-align: center;
-            border-top: 10px solid var(--primary);
-        }
+    /* HEADER with double logo & progress */
+    .header {
+      background: white;
+      border-radius: 32px;
+      padding: 20px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.08);
+      border-top: 6px solid #3b82f6;
+      transition: all 0.2s;
+    }
 
-        #quiz-screen, #result-screen { display: none; }
+    .logos-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-        .logos-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .logo { height: 60px; object-fit: contain; background: transparent; }
+    .logo {
+      height: 68px;
+      width: auto;
+      object-fit: contain;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 6px 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
 
-        input {
-            width: 85%; 
-            padding: 16px; 
-            margin: 25px 0;
-            border: 2px solid #e2e8f0; 
-            border-radius: 40px;
-            font-size: 1.1rem; 
-            text-align: center; 
-            font-family: 'Poppins';
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .header-text {
+      text-align: center;
+      margin-bottom: 12px;
+    }
 
-        .btn {
-            background: var(--primary); 
-            color: white; 
-            border: none;
-            padding: 14px 36px; 
-            border-radius: 40px; 
-            font-size: 1.1rem;
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: 0.2s;
-            display: inline-block;
-        }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(59, 130, 246, 0.35); background: #2563eb; }
+    .header h1 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(120deg, #1e3c72, #2b4f8c);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
 
-        /* TABS inside quiz screen */
-        .tabs-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1rem;
-            font-family: 'Poppins';
-            color: #334155;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 6px 14px rgba(59,130,246,0.3);
-        }
-        .tab-btn:not(.active):hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
+    .header p {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #3b82f6;
+      background: #eef2ff;
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 40px;
+      margin-top: 8px;
+    }
 
-        /* Progress bar */
-        .progress-container {
-            width: 100%; 
-            background: #e2e8f0; 
-            height: 12px;
-            border-radius: 20px; 
-            margin: 0 0 20px 0; 
-            overflow: hidden;
-        }
-        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: 0.4s ease; }
+    /* PROGRESS BAR */
+    .progress-container {
+      background: #e2e8f0;
+      border-radius: 40px;
+      height: 12px;
+      margin-top: 18px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
 
-        /* Questions grid - scrollable cards */
-        .questions-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-height: 55vh;
-            overflow-y: auto;
-            padding-right: 6px;
-        }
-        .question-card {
-            background: #fefefe;
-            border-radius: 28px;
-            padding: 18px 24px;
-            text-align: left;
-            border: 1px solid #eef2ff;
-            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.05);
-            transition: 0.2s;
-        }
-        .question-text {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 18px;
-            color: #0f172a;
-            border-left: 4px solid var(--primary);
-            padding-left: 14px;
-        }
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .option-btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-            font-family: 'Poppins';
-        }
-        .option-btn:hover:not(:disabled) {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-            transform: scale(0.99);
-        }
-        .option-btn:disabled { cursor: default; opacity: 0.9; }
-        .correct {
-            background: #d1fae5 !important;
-            border-color: #10b981 !important;
-            color: #065f46;
-        }
-        .wrong {
-            background: #ffe4e2 !important;
-            border-color: #f97316 !important;
-            color: #9b2c1d;
-        }
-        .icon-emoji { font-size: 1.3rem; margin-left: 12px; }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 40px;
+      transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
 
-        /* Result screen */
-        .medal-icon { font-size: 85px; margin-bottom: 10px; animation: gentleBounce 1s infinite alternate; }
-        @keyframes gentleBounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-        .rank-badge { font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
-        .cert-btn { background: #6366f1; margin-top: 20px; }
-        .new-quiz-btn { background: #475569; margin-top: 15px; }
+    /* TABS STYLING - MODERN SWITCH */
+    .tabs-wrapper {
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
 
-        /* Scrollbar */
-        .questions-grid::-webkit-scrollbar { width: 6px; }
-        .questions-grid::-webkit-scrollbar-track { background: #eef2ff; border-radius: 10px; }
-        .questions-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        @media (max-width: 550px) {
-            .card { padding: 20px; }
-            .question-text { font-size: 1rem; }
-            .option-btn { padding: 10px 14px; font-size: 0.85rem; }
-        }
-    </style>
+    .tab-btn {
+      background: white;
+      border: none;
+      padding: 12px 32px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.25s ease;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03);
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(2px);
+    }
+
+    .tab-btn.active {
+      background: #3b82f6;
+      color: white;
+      box-shadow: 0 8px 18px rgba(59,130,246,0.25);
+      transform: scale(1.02);
+    }
+
+    .tab-btn:not(.active):hover {
+      background: #f1f5f9;
+      color: #1e40af;
+      transform: translateY(-2px);
+    }
+
+    /* QUESTION CARDS */
+    .question-card {
+      background: white;
+      padding: 24px 28px;
+      border-radius: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .question-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 28px -14px rgba(0, 0, 0, 0.12);
+    }
+
+    .question-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #0f172a;
+      line-height: 1.4;
+      border-left: 5px solid #3b82f6;
+      padding-left: 16px;
+    }
+
+    /* OPTIONS GRID */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: #fefefe;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: scale(0.99);
+    }
+
+    .option-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+      opacity: 0.95;
+    }
+
+    .correct {
+      background: #d1fae5 !important;
+      border-color: #10b981 !important;
+      color: #065f46 !important;
+    }
+
+    .wrong {
+      background: #ffe4e2 !important;
+      border-color: #f97316 !important;
+      color: #9b2c1d !important;
+    }
+
+    .icon {
+      font-size: 1.3rem;
+      margin-left: 12px;
+      font-weight: 500;
+    }
+
+    /* SIGNATURE SECTION */
+    .signature-section {
+      background: white;
+      border-radius: 28px;
+      padding: 20px 28px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      text-align: right;
+    }
+
+    .signature-text {
+      font-family: 'Segoe Script', 'Segoe UI Script', cursive;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+    }
+
+    /* FIXED SCOREBOARD */
+    .score-board {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 14px 36px;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      z-index: 1100;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      text-align: center;
+      white-space: nowrap;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 550px) {
+      .score-board {
+        font-size: 1rem;
+        padding: 10px 22px;
+        white-space: nowrap;
+      }
+      .question-title {
+        font-size: 1.1rem;
+      }
+      .tab-btn {
+        padding: 8px 22px;
+        font-size: 0.9rem;
+      }
+      .logo {
+        height: 50px;
+      }
+      .signature-text {
+        font-size: 1.4rem;
+      }
+    }
+
+    /* smooth empty state */
+    #quiz-container {
+      min-height: 360px;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-
-    <!-- SCREEN 1: WELCOME -->
-    <div id="welcome-screen" class="card">
-        <div class="logos-container">
-            <img src="neu-logo.png" alt="Neu Academy Logo" class="logo" id="logo-neu">
-            <img src="lights-logo.png" alt="Lights Logo" class="logo" id="logo-lights">
-        </div>
-        <h1>📖 English Grade 6</h1>
-        <p>Assessment by <strong>Mr. Ali Misbah</strong></p>
-        <input type="text" id="student-name" placeholder="Enter Your Full Name">
-        <br>
-        <button class="btn" onclick="startQuiz()">✨ Start Quiz ✨</button>
+  <div class="header">
+    <div class="logos-container">
+      <!-- Left logo (NEU Academy) -->
+      <img src="https://placehold.co/400x120?text=NEU+Academy&font=poppins" alt="Neu Academy Logo" class="logo" style="background:transparent; object-fit:contain;">
+      <!-- Right logo (Lights) -->
+      <img src="https://placehold.co/400x120?text=LIGHTS+EDU&font=poppins" alt="Lights Logo" class="logo" style="background:transparent;">
     </div>
-
-    <!-- SCREEN 2: QUIZ with TABS (Articles + Question Tags) -->
-    <div id="quiz-screen" class="card">
-        <!-- Tab Navigation -->
-        <div class="tabs-container">
-            <button class="tab-btn active" data-tab="articles">📘 Articles (a/an/the/no article)</button>
-            <button class="tab-btn" data-tab="tags">🔖 Question Tags (Present Simple)</button>
-        </div>
-
-        <!-- Global Progress -->
-        <div class="progress-container">
-            <div class="progress-bar" id="global-progress-bar"></div>
-        </div>
-        <div style="font-weight: 600; margin-bottom: 20px; color: #334155; display: flex; justify-content: space-between;">
-            <span>📊 Overall progress</span>
-            <span><span id="answered-counter">0</span> / <span id="total-counter">10</span> answered</span>
-        </div>
-
-        <!-- Dynamic questions will be injected here -->
-        <div id="questions-container" class="questions-grid"></div>
+    <div class="header-text">
+      <h1>📖 Grade 6 English Quiz</h1>
+      <p>👨‍🏫 Teacher: Mr. Ali Misbah</p>
     </div>
-
-    <!-- SCREEN 3: RESULTS -->
-    <div id="result-screen" class="card">
-        <div class="medal-icon" id="medal-slot">🏆</div>
-        <div class="rank-badge" id="rank-slot">Grammar Champion</div>
-        <h2 id="final-score-text">You scored 0/10</h2>
-        <p>🌟 Great effort! Download your personalized certificate.</p>
-        <button class="btn cert-btn" onclick="downloadCertificate()">📜 Download Certificate</button>
-        <br><br>
-        <button class="btn new-quiz-btn" onclick="resetToWelcome()">🔄 Take New Quiz</button>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
+  </div>
 
+  <!-- TABS SECTION -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" data-tab="articles">📘 Articles (a, an, the, no article)</button>
+    <button class="tab-btn" data-tab="tags">🔖 Question Tags (Present Simple)</button>
+  </div>
+
+  <!-- QUIZ DYNAMIC CONTAINER -->
+  <div id="quiz-container"></div>
+
+  <!-- SIGNATURE SECTION (Text-based, Segoe Script) -->
+  <div class="signature-section">
+    <div class="signature-text">Mr. Ali Misbah</div>
+  </div>
 </div>
 
-<!-- Audio Assets (for feedback) -->
-<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
-<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
-<audio id="snd-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+<!-- STICKY SCORE -->
+<div class="score-board" id="scoreBoard">⭐ Score: 0 / 10</div>
 
 <script>
-    const { jsPDF } = window.jspdf;
+  // ==========================================
+  // MASTER QUESTION BANK (Articles + Question Tags)
+  // ==========================================
+  const MASTER_QUESTIONS = [
+    // ---------- ARTICLES (5) ----------
+    {
+      id: 0,
+      text: "1. He got his degree from ......... university in London.",
+      options: ["the", "no article", "a", "an"],
+      correctIndex: 2,   // "a"
+      category: "articles"
+    },
+    {
+      id: 1,
+      text: "2. France is ......... European country on the Mediterranean Sea.",
+      options: ["a", "the", "an", "no article"],
+      correctIndex: 0,   // "a"
+      category: "articles"
+    },
+    {
+      id: 2,
+      text: "3. The train can travel at 90 kilometers ......... hour.",
+      options: ["the", "an", "a", "no article"],
+      correctIndex: 1,   // "an" (hour -> vowel sound)
+      category: "articles"
+    },
+    {
+      id: 3,
+      text: "4. They don't need ......... advice from you.",
+      options: ["the", "no article", "an", "a"],
+      correctIndex: 1,   // "no article" (uncountable general)
+      category: "articles"
+    },
+    {
+      id: 4,
+      text: "5. ......... cats are independent animals.",
+      options: ["the", "no article", "a", "an"],
+      correctIndex: 1,   // "no article" (general plural)
+      category: "articles"
+    },
+    // ---------- QUESTION TAGS (5) ----------
+    {
+      id: 5,
+      text: "1. Let's start the lesson, .......... ?",
+      options: ["will you", "shall we", "don't we", "won't you"],
+      correctIndex: 1,   // shall we
+      category: "tags"
+    },
+    {
+      id: 6,
+      text: "2. Open the window, .......... ?",
+      options: ["shall we", "don't you", "will you", "won't we"],
+      correctIndex: 2,   // will you (imperative)
+      category: "tags"
+    },
+    {
+      id: 7,
+      text: "3. He has already left, .......... ?",
+      options: ["hasn't he", "didn't he", "doesn't he", "isn't he"],
+      correctIndex: 0,   // hasn't he
+      category: "tags"
+    },
+    {
+      id: 8,
+      text: "4. She can speak three languages, .......... ?",
+      options: ["did she", "can she", "can't she", "doesn't she"],
+      correctIndex: 2,   // can't she
+      category: "tags"
+    },
+    {
+      id: 9,
+      text: "5. They must follow the rules, .......... ?",
+      options: ["mustn't they", "didn't they", "don't they", "must they"],
+      correctIndex: 0,   // mustn't they
+      category: "tags"
+    }
+  ];
 
-    // ======================= MASTER QUESTION BANK (10 Questions) =======================
-    // Articles (5) + Question Tags (5)
-    const MASTER_QUESTIONS = [
-        // ARTICLES (id 0-4)
-        { id: 0, text: "1. He got his degree from ......... university in London.", options: ["the", "no article", "a", "an"], correct: 2, category: "articles" },
-        { id: 1, text: "2. France is ......... European country on the Mediterranean Sea.", options: ["a", "the", "an", "no article"], correct: 0, category: "articles" },
-        { id: 2, text: "3. The train can travel at 90 kilometers ......... hour.", options: ["the", "an", "a", "no article"], correct: 1, category: "articles" },
-        { id: 3, text: "4. They don’t need ......... advice from you.", options: ["the", "no article", "an", "a"], correct: 1, category: "articles" },
-        { id: 4, text: "5. ......... cats are independent animals.", options: ["the", "no article", "a", "an"], correct: 1, category: "articles" },
-        // QUESTION TAGS (id 5-9)
-        { id: 5, text: "1. Let's start the lesson, .......... ?", options: ["will you", "shall we", "don't we", "won't you"], correct: 1, category: "tags" },
-        { id: 6, text: "2. Open the window, .......... ?", options: ["shall we", "don't you", "will you", "won't we"], correct: 2, category: "tags" },
-        { id: 7, text: "3. He has already left, .......... ?", options: ["hasn't he", "didn't he", "doesn't he", "isn't he"], correct: 0, category: "tags" },
-        { id: 8, text: "4. She can speak three languages, .......... ?", options: ["did she", "can she", "can't she", "doesn't she"], correct: 2, category: "tags" },
-        { id: 9, text: "5. They must follow the rules, .......... ?", options: ["mustn't they", "didn't they", "don't they", "must they"], correct: 0, category: "tags" }
-    ];
+  const TOTAL_QS = MASTER_QUESTIONS.length;  // = 10
 
-    const TOTAL_QS = MASTER_QUESTIONS.length;  // = 10
-
-    // Global state
-    let studentName = "";
-    let userAnswers = new Array(TOTAL_QS).fill(null);      // stores selected option index or null
-    let confettiTriggered = false;
-    let currentTab = "articles";        // 'articles' or 'tags'
+  // Answer state: stores the selected option index for each question (null = not answered)
+  let userAnswers = new Array(TOTAL_QS).fill(null);
+  
+  // UI state
+  let currentTab = "articles";   // 'articles' or 'tags'
+  let confettiFired = false;
+  
+  // DOM elements
+  const quizContainer = document.getElementById("quiz-container");
+  const progressBar = document.getElementById("progressBar");
+  const scoreBoardEl = document.getElementById("scoreBoard");
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  
+  // ========== HELPER: Update global stats (score, answered count, progress, final confetti) ==========
+  function updateGlobalStatsAndUI() {
+    let answeredCount = 0;
+    let currentScore = 0;
     
-    // DOM elements
-    const welcomeScreen = document.getElementById('welcome-screen');
-    const quizScreen = document.getElementById('quiz-screen');
-    const resultScreen = document.getElementById('result-screen');
-    const questionsContainer = document.getElementById('questions-container');
-    const globalProgressBar = document.getElementById('global-progress-bar');
-    const answeredSpan = document.getElementById('answered-counter');
-    const totalSpan = document.getElementById('total-counter');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-
-    // Helper: update global stats (answered count, score, progress bar, and trigger result if all completed)
-    function updateGlobalStats() {
-        let answeredCount = 0;
-        let currentScore = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null) {
-                answeredCount++;
-                if (userAnswers[i] === MASTER_QUESTIONS[i].correct) {
-                    currentScore++;
-                }
-            }
+    for (let i = 0; i < TOTAL_QS; i++) {
+      if (userAnswers[i] !== null) {
+        answeredCount++;
+        if (userAnswers[i] === MASTER_QUESTIONS[i].correctIndex) {
+          currentScore++;
         }
-        const percent = (answeredCount / TOTAL_QS) * 100;
-        globalProgressBar.style.width = `${percent}%`;
-        if (answeredSpan) answeredSpan.innerText = answeredCount;
-        if (totalSpan) totalSpan.innerText = TOTAL_QS;
-        
-        // If all questions answered and celebration not yet triggered -> show results & confetti
-        if (answeredCount === TOTAL_QS && !confettiTriggered) {
-            confettiTriggered = true;
-            const winAudio = document.getElementById('snd-win');
-            if (winAudio) winAudio.play().catch(e => console.log);
-            // Burst of confetti
-            canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6 }, startVelocity: 25 });
-            canvasConfetti({ particleCount: 100, spread: 120, origin: { y: 0.5, x: 0.3 }, colors: ['#3b82f6', '#10b981'] });
-            canvasConfetti({ particleCount: 100, spread: 120, origin: { y: 0.5, x: 0.7 }, colors: ['#facc15', '#ef4444'] });
-            // Short delay to let last answer animation finish
-            setTimeout(() => {
-                showResultScreen(currentScore);
-            }, 500);
-        }
-        return { answeredCount, currentScore };
-    }
-
-    // Render questions based on current tab (articles or tags)
-    function renderCurrentTab() {
-        if (!questionsContainer) return;
-        const filtered = MASTER_QUESTIONS.filter(q => q.category === currentTab);
-        questionsContainer.innerHTML = "";
-        
-        filtered.forEach(question => {
-            const globalIdx = question.id;
-            const selectedIdx = userAnswers[globalIdx];
-            const isAnswered = (selectedIdx !== null);
-            const correctIdx = question.correct;
-            
-            const card = document.createElement('div');
-            card.className = 'question-card';
-            
-            const qTextDiv = document.createElement('div');
-            qTextDiv.className = 'question-text';
-            qTextDiv.innerText = question.text;
-            card.appendChild(qTextDiv);
-            
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'options-group';
-            
-            question.options.forEach((opt, optIndex) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                const textSpan = document.createElement('span');
-                textSpan.innerText = opt;
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'icon-emoji';
-                btn.appendChild(textSpan);
-                btn.appendChild(iconSpan);
-                
-                if (isAnswered) {
-                    btn.disabled = true;
-                    if (optIndex === correctIdx) {
-                        btn.classList.add('correct');
-                        iconSpan.innerText = '✅';
-                    }
-                    if (optIndex === selectedIdx && selectedIdx !== correctIdx) {
-                        btn.classList.add('wrong');
-                        iconSpan.innerText = '❌';
-                    }
-                } else {
-                    btn.disabled = false;
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        // Prevent double answering
-                        if (userAnswers[globalIdx] !== null) return;
-                        // Record answer
-                        userAnswers[globalIdx] = optIndex;
-                        // Play sound based on correctness
-                        const isCorrect = (optIndex === correctIdx);
-                        if (isCorrect) {
-                            const correctSound = document.getElementById('snd-correct');
-                            correctSound.play().catch(e => console.log);
-                        } else {
-                            const wrongSound = document.getElementById('snd-wrong');
-                            wrongSound.play().catch(e => console.log);
-                        }
-                        // Update global stats and re-render current tab to show feedback
-                        updateGlobalStats();
-                        renderCurrentTab();  // re-render to lock buttons & show correct/wrong
-                    });
-                }
-                optionsDiv.appendChild(btn);
-            });
-            card.appendChild(optionsDiv);
-            questionsContainer.appendChild(card);
-        });
-        
-        if (filtered.length === 0) {
-            questionsContainer.innerHTML = '<div style="padding: 30px; text-align:center;">✨ No questions in this section ✨</div>';
-        }
+      }
     }
     
-    // Switch tab handler
-    function switchTab(tabId) {
-        currentTab = tabId;
-        tabBtns.forEach(btn => {
-            const tabVal = btn.getAttribute('data-tab');
-            if (tabVal === tabId) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        renderCurrentTab();
+    // Update progress bar width
+    const percent = (answeredCount / TOTAL_QS) * 100;
+    progressBar.style.width = `${percent}%`;
+    
+    // Update scoreboard text
+    scoreBoardEl.innerHTML = `⭐ Score: ${currentScore} / ${TOTAL_QS}`;
+    
+    // If all questions answered and confetti hasn't fired yet, celebrate!
+    if (answeredCount === TOTAL_QS && !confettiFired) {
+      confettiFired = true;
+      scoreBoardEl.style.background = "#10b981";
+      scoreBoardEl.style.boxShadow = "0 0 18px #10b98180";
+      scoreBoardEl.innerHTML = `🎉 FINAL SCORE: ${currentScore} / ${TOTAL_QS} 🎉`;
+      shootConfettiExplosion();
+    } else if (answeredCount !== TOTAL_QS) {
+      // keep original dark theme if not completed
+      scoreBoardEl.style.background = "#1e293b";
+      scoreBoardEl.style.boxShadow = "0 12px 30px rgba(0, 0, 0, 0.3)";
     }
     
-    // Show result screen with final score and medal/rank
-    function showResultScreen(finalScore) {
-        quizScreen.style.display = 'none';
-        resultScreen.style.display = 'block';
-        
-        const percent = (finalScore / TOTAL_QS) * 100;
-        let rank = "", medal = "";
-        if (percent === 100) { rank = "Grammar King 👑"; medal = "🏆"; }
-        else if (percent >= 80) { rank = "English Expert 🥇"; medal = "🥇"; }
-        else if (percent >= 60) { rank = "Rising Star 🥈"; medal = "🥈"; }
-        else { rank = "Keep Learning 📚"; medal = "🥉"; }
-        
-        document.getElementById('medal-slot').innerHTML = medal;
-        document.getElementById('rank-slot').innerHTML = rank;
-        document.getElementById('final-score-text').innerHTML = `Final Score: ${finalScore} / ${TOTAL_QS}`;
+    return { answeredCount, currentScore };
+  }
+  
+  // ========== CONFETTI CELEBRATION ==========
+  function shootConfettiExplosion() {
+    const duration = 2500;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 28, spread: 380, ticks: 70, zIndex: 9999, colors: ['#3b82f6', '#10b981', '#facc15', '#ef4444'] };
+    
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
     }
     
-    // Certificate generation (uses studentName, total score, logos)
-    function downloadCertificate() {
-        // Calculate final score again
-        let finalScore = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null && userAnswers[i] === MASTER_QUESTIONS[i].correct) finalScore++;
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+      const particleCount = 40 * (timeLeft / duration);
+      // left side
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      // right side
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+      // middle extra
+      confetti(Object.assign({}, defaults, { particleCount: particleCount * 0.8, origin: { x: 0.5, y: Math.random() * 0.5 } }));
+    }, 200);
+  }
+  
+  // ========== RENDER ACTIVE TAB (Articles OR Question Tags) ==========
+  function renderCurrentTab() {
+    // Filter questions based on currentTab
+    const filteredQuestions = MASTER_QUESTIONS.filter(q => q.category === currentTab);
+    
+    if (!quizContainer) return;
+    quizContainer.innerHTML = "";
+    
+    // Iterate over filtered questions and build cards
+    filteredQuestions.forEach(question => {
+      const globalIdx = question.id;   // original index in master array
+      const answeredSelection = userAnswers[globalIdx];
+      const isAnswered = (answeredSelection !== null);
+      const correctIdx = question.correctIndex;
+      
+      // Create card
+      const card = document.createElement("div");
+      card.className = "question-card";
+      
+      // Question title
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "question-title";
+      titleDiv.innerText = question.text;
+      card.appendChild(titleDiv);
+      
+      // Options grid
+      const optionsGrid = document.createElement("div");
+      optionsGrid.className = "options-grid";
+      
+      // Loop through options
+      question.options.forEach((optText, optIndex) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        
+        // Prepare inner spans
+        const textSpan = document.createElement("span");
+        textSpan.innerText = optText;
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "icon";
+        iconSpan.innerText = "";   // empty by default
+        
+        btn.appendChild(textSpan);
+        btn.appendChild(iconSpan);
+        
+        // If question already answered: show correct/wrong styling, disable, add icons
+        if (isAnswered) {
+          btn.disabled = true;
+          // highlight correct answer for all buttons
+          if (optIndex === correctIdx) {
+            btn.classList.add("correct");
+            iconSpan.innerText = "✅";
+          }
+          // If this button is the user's selected answer AND it's incorrect -> show wrong style & cross
+          if (optIndex === answeredSelection && answeredSelection !== correctIdx) {
+            btn.classList.add("wrong");
+            iconSpan.innerText = "❌";
+          }
+          // Edge: if user selected correct answer, the correct button already has checkmark; no additional cross.
+          // Also if selected correct, the correct button gets check and correct class.
+        } else {
+          // Not answered yet: attach click handler
+          btn.disabled = false;
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            // prevent re-answering
+            if (userAnswers[globalIdx] !== null) return;
+            // record answer
+            userAnswers[globalIdx] = optIndex;
+            // update stats & progress + re-render current tab to reflect correct/wrong highlights
+            updateGlobalStatsAndUI();
+            renderCurrentTab();   // refresh current tab view (shows feedback)
+          });
         }
         
-        const doc = new jsPDF({ orientation: 'landscape' });
-        const neuLogo = document.getElementById('logo-neu');
-        const lightsLogo = document.getElementById('logo-lights');
-        const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-        
-        // Elegant Border
-        doc.setDrawColor(59, 130, 246);
-        doc.setLineWidth(4);
-        doc.rect(10, 10, 277, 190);
-        
-        // Add logos if available (graceful fallback)
-        try {
-            if (neuLogo && neuLogo.complete !== false) doc.addImage(neuLogo, 'PNG', 20, 20, 48, 26);
-            if (lightsLogo && lightsLogo.complete !== false) doc.addImage(lightsLogo, 'PNG', 225, 20, 48, 26);
-        } catch(e) { console.log("Logo rendering skipped"); }
-        
-        doc.setTextColor(30, 41, 59);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(34);
-        doc.text("CERTIFICATE OF ACHIEVEMENT", 148, 65, { align: "center" });
-        
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "normal");
-        doc.text("This is to certify that", 148, 88, { align: "center" });
-        
-        doc.setFontSize(32);
-        doc.setTextColor(59, 130, 246);
-        const displayName = studentName ? studentName.toUpperCase() : "STUDENT";
-        doc.text(displayName, 148, 115, { align: "center" });
-        
-        doc.setTextColor(30, 41, 59);
-        doc.setFontSize(17);
-        doc.text("Successfully completed the Grade 6 English Assessment", 148, 138, { align: "center" });
-        doc.text(`Final Score: ${finalScore} out of ${TOTAL_QS}`, 148, 152, { align: "center" });
-        doc.text(`Date: ${today}`, 148, 162, { align: "center" });
-        
-        // Signature area with Mr. Ali Misbah
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "italic");
-        doc.text("Mr. Ali Misbah", 148, 180, { align: "center" });
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(11);
-        doc.text("__________________________", 148, 176, { align: "center" });
-        doc.text("English Teacher", 148, 186, { align: "center" });
-        
-        doc.save(`${studentName.replace(/\s+/g, '_')}_English_Certificate.pdf`);
-    }
-    
-    // Reset everything and go back to welcome screen (allow new attempt)
-    function resetToWelcome() {
-        // Reset global state
-        userAnswers.fill(null);
-        confettiTriggered = false;
-        currentTab = "articles";
-        // Reset UI visibility
-        welcomeScreen.style.display = "block";
-        resultScreen.style.display = "none";
-        quizScreen.style.display = "none";
-        // Clear name input? keep name field empty for fresh entry
-        const nameInputField = document.getElementById('student-name');
-        if (nameInputField) nameInputField.value = "";
-        studentName = "";
-        // Reset progress bar display (next start will re-init)
-    }
-    
-    // Start quiz after name entry
-    function startQuiz() {
-        const nameInput = document.getElementById('student-name').value.trim();
-        if (nameInput === "") {
-            alert("✨ Please enter your name to begin the quiz!");
-            return;
-        }
-        studentName = nameInput;
-        // Reset all answer states for fresh quiz
-        userAnswers.fill(null);
-        confettiTriggered = false;
-        currentTab = "articles";
-        // Update tab active style
-        tabBtns.forEach(btn => {
-            if (btn.getAttribute('data-tab') === 'articles') btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        // Render the articles tab by default
-        renderCurrentTab();
-        updateGlobalStats(); // progress bar set to 0
-        // Switch screens
-        welcomeScreen.style.display = "none";
-        quizScreen.style.display = "block";
-        resultScreen.style.display = "none";
-    }
-    
-    // Event listeners for tabs
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const tabValue = btn.getAttribute('data-tab');
-            if (tabValue === 'articles') switchTab('articles');
-            else if (tabValue === 'tags') switchTab('tags');
-        });
+        optionsGrid.appendChild(btn);
+      });
+      
+      card.appendChild(optionsGrid);
+      quizContainer.appendChild(card);
     });
     
-    // Initialize total counter display
-    if (totalSpan) totalSpan.innerText = TOTAL_QS;
-    
-    // Expose functions globally for inline onclick
-    window.startQuiz = startQuiz;
-    window.downloadCertificate = downloadCertificate;
-    window.resetToWelcome = resetToWelcome;
-    
-    // Preload audio to avoid delay (optional)
-    const sounds = ['snd-correct', 'snd-wrong', 'snd-win'];
-    sounds.forEach(id => { let audio = document.getElementById(id); if(audio) audio.load(); });
+    // If no questions in category? impossible, but safe
+    if (filteredQuestions.length === 0) {
+      quizContainer.innerHTML = "<div style='text-align:center;padding:40px;background:white;border-radius:28px;'>✨ No questions in this section ✨</div>";
+    }
+  }
+  
+  // ========== HANDLE TAB SWITCHING ==========
+  function switchTab(tabId) {
+    currentTab = tabId;
+    // update active styles on buttons
+    tabBtns.forEach(btn => {
+      const btnTab = btn.getAttribute("data-tab");
+      if (btnTab === tabId) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+    // re-render the current tab content
+    renderCurrentTab();
+  }
+  
+  // ========== EVENT LISTENERS FOR TABS ==========
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tabValue = btn.getAttribute("data-tab");
+      if (tabValue === "articles") switchTab("articles");
+      else if (tabValue === "tags") switchTab("tags");
+    });
+  });
+  
+  // ========== INITIAL LOAD & RESET (optional but fresh start) ==========
+  function initQuiz() {
+    // reset answer state (fresh start for all 10 questions)
+    userAnswers.fill(null);
+    confettiFired = false;
+    // Reset scoreboard style
+    scoreBoardEl.style.background = "#1e293b";
+    // reset progress bar
+    progressBar.style.width = "0%";
+    // initial score display
+    updateGlobalStatsAndUI();
+    // start with articles tab
+    currentTab = "articles";
+    // ensure tab UI active matches
+    tabBtns.forEach(btn => {
+      if (btn.getAttribute("data-tab") === "articles") btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+    renderCurrentTab();
+  }
+  
+  // trigger initialization
+  initQuiz();
 </script>
 </body>
 </html>
