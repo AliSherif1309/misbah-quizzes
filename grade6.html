@@ -1,631 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Grade 6 English Quiz - Articles & Question Tags | Mr. Ali Misbah</title>
-  
-  <!-- Google Fonts: Poppins for modern rounded look -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Canvas Confetti Library for celebration -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.css"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6 English - Mr. Ali Misbah</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <style>
+        :root { --primary: #3b82f6; --success: #10b981; --error: #ef4444; --bg: #f8fafc; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 800px; }
+        .card { background: white; padding: 30px; border-radius: 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center; border-top: 10px solid var(--primary); }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #eef2f9 0%, #d9e4f5 100%);
-      color: #1e293b;
-      margin: 0;
-      padding: 24px 20px;
-      padding-bottom: 110px;
-    }
+        #quiz-screen, #result-screen { display: none; }
 
-    .container {
-      max-width: 880px;
-      margin: 0 auto;
-    }
+        .tabs-container { display: flex; justify-content: center; gap: 12px; background: #f1f5f9; padding: 8px; border-radius: 20px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; border: none; padding: 12px; border-radius: 16px; font-family: 'Poppins'; cursor: pointer; transition: 0.3s; background: transparent; color: #64748b; }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .tab-title { font-weight: 800; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        .tab-stats-row { display: flex; justify-content: center; gap: 8px; font-size: 0.7rem; font-weight: 700; }
+        .stat-pill { padding: 2px 8px; border-radius: 20px; background: #e2e8f0; }
+        .tab-btn.active .stat-pill.done { background: #dbeafe; color: var(--primary); }
+        .tab-btn.active .stat-pill.hits { background: #dcfce7; color: var(--success); }
 
-    /* HEADER with double logo & progress */
-    .header {
-      background: white;
-      border-radius: 32px;
-      padding: 20px 28px;
-      margin-bottom: 28px;
-      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.08);
-      border-top: 6px solid #3b82f6;
-      transition: all 0.2s;
-    }
+        .logos-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { height: 60px; }
 
-    .logos-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+        .progress-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 10px 20px; border-radius: 50px; }
+        .progress-container { flex: 1; background: #e2e8f0; height: 10px; border-radius: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: 0.4s; }
 
-    .logo {
-      height: 68px;
-      width: auto;
-      object-fit: contain;
-      background: #f8fafc;
-      border-radius: 18px;
-      padding: 6px 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    }
+        .questions-grid { display: flex; flex-direction: column; gap: 20px; max-height: 50vh; overflow-y: auto; padding: 10px; scroll-behavior: smooth; text-align: left; }
+        .question-card { background: #fff; border: 2px solid #f1f5f9; padding: 20px; border-radius: 20px; transition: 0.3s; }
+        .question-text { font-weight: 700; margin-bottom: 15px; line-height: 1.4; border-left: 4px solid var(--primary); padding-left: 12px; }
+        
+        .option-btn { width: 100%; padding: 14px; margin-bottom: 8px; border: 2px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-family: 'Poppins'; font-weight: 600; cursor: pointer; text-align: left; }
+        .correct { background: #d1fae5 !important; border-color: #10b981 !important; color: #065f46; }
+        .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
 
-    .header-text {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .header h1 {
-      font-size: 1.9rem;
-      font-weight: 800;
-      background: linear-gradient(120deg, #1e3c72, #2b4f8c);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      letter-spacing: -0.3px;
-    }
-
-    .header p {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #3b82f6;
-      background: #eef2ff;
-      display: inline-block;
-      padding: 4px 16px;
-      border-radius: 40px;
-      margin-top: 8px;
-    }
-
-    /* PROGRESS BAR */
-    .progress-container {
-      background: #e2e8f0;
-      border-radius: 40px;
-      height: 12px;
-      margin-top: 18px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #10b981, #34d399);
-      border-radius: 40px;
-      transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-
-    /* TABS STYLING - MODERN SWITCH */
-    .tabs-wrapper {
-      margin-bottom: 28px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      background: white;
-      border: none;
-      padding: 12px 32px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border-radius: 60px;
-      cursor: pointer;
-      color: #475569;
-      transition: all 0.25s ease;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03);
-      letter-spacing: 0.3px;
-      backdrop-filter: blur(2px);
-    }
-
-    .tab-btn.active {
-      background: #3b82f6;
-      color: white;
-      box-shadow: 0 8px 18px rgba(59,130,246,0.25);
-      transform: scale(1.02);
-    }
-
-    .tab-btn:not(.active):hover {
-      background: #f1f5f9;
-      color: #1e40af;
-      transform: translateY(-2px);
-    }
-
-    /* QUESTION CARDS */
-    .question-card {
-      background: white;
-      padding: 24px 28px;
-      border-radius: 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-    }
-
-    .question-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 20px 28px -14px rgba(0, 0, 0, 0.12);
-    }
-
-    .question-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: #0f172a;
-      line-height: 1.4;
-      border-left: 5px solid #3b82f6;
-      padding-left: 16px;
-    }
-
-    /* OPTIONS GRID */
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .option-btn {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 20px;
-      background: #fefefe;
-      border: 2px solid #e2e8f0;
-      border-radius: 20px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 1rem;
-      color: #1e293b;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
-      width: 100%;
-    }
-
-    .option-btn:hover:not(:disabled) {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-      transform: scale(0.99);
-    }
-
-    .option-btn:active:not(:disabled) {
-      transform: scale(0.97);
-    }
-
-    .option-btn:disabled {
-      cursor: default;
-      opacity: 0.95;
-    }
-
-    .correct {
-      background: #d1fae5 !important;
-      border-color: #10b981 !important;
-      color: #065f46 !important;
-    }
-
-    .wrong {
-      background: #ffe4e2 !important;
-      border-color: #f97316 !important;
-      color: #9b2c1d !important;
-    }
-
-    .icon {
-      font-size: 1.3rem;
-      margin-left: 12px;
-      font-weight: 500;
-    }
-
-    /* SIGNATURE SECTION */
-    .signature-section {
-      background: white;
-      border-radius: 28px;
-      padding: 20px 28px;
-      margin-top: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      text-align: right;
-    }
-
-    .signature-text {
-      font-family: 'Segoe Script', 'Segoe UI Script', cursive;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: #0f172a;
-      letter-spacing: 0.5px;
-    }
-
-    /* FIXED SCOREBOARD */
-    .score-board {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b;
-      color: white;
-      padding: 14px 36px;
-      border-radius: 60px;
-      font-size: 1.3rem;
-      font-weight: 800;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-      z-index: 1100;
-      backdrop-filter: blur(4px);
-      transition: all 0.3s ease;
-      text-align: center;
-      white-space: nowrap;
-      font-family: monospace;
-      letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 550px) {
-      .score-board {
-        font-size: 1rem;
-        padding: 10px 22px;
-        white-space: nowrap;
-      }
-      .question-title {
-        font-size: 1.1rem;
-      }
-      .tab-btn {
-        padding: 8px 22px;
-        font-size: 0.9rem;
-      }
-      .logo {
-        height: 50px;
-      }
-      .signature-text {
-        font-size: 1.4rem;
-      }
-    }
-
-    /* smooth empty state */
-    #quiz-container {
-      min-height: 360px;
-    }
-  </style>
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 700; cursor: pointer; font-size: 1.1rem; }
+        input { width: 80%; padding: 15px; border-radius: 50px; border: 2px solid #e2e8f0; text-align: center; font-family: 'Poppins'; font-size: 1.1rem; margin-bottom: 20px; }
+        
+        #next-tab-btn { margin-top: 20px; width: 100%; display: none; }
+        
+        /* Result Screen Buttons */
+        .result-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <div class="logos-container">
-      <!-- Left logo (NEU Academy) -->
-      <img src="https://placehold.co/400x120?text=NEU+Academy&font=poppins" alt="Neu Academy Logo" class="logo" style="background:transparent; object-fit:contain;">
-      <!-- Right logo (Lights) -->
-      <img src="https://placehold.co/400x120?text=LIGHTS+EDU&font=poppins" alt="Lights Logo" class="logo" style="background:transparent;">
+    <div id="welcome-screen" class="card">
+        <div class="logos-container">
+            <img src="neu-logo.png" class="logo" id="logo-neu">
+            <img src="lights-logo.png" class="logo" id="logo-lights">
+        </div>
+        <h1>📘 Grade 6 Unit 5 Grammars Quiz</h1>
+        <p>Teacher: Mr. Ali Misbah</p>
+        <input type="text" id="student-name" placeholder="Enter Your Full Name">
+        <br>
+        <button class="btn-main" onclick="startQuiz()">Start Quiz ✨</button>
     </div>
-    <div class="header-text">
-      <h1>📖 Grade 6 English Quiz</h1>
-      <p>👨‍🏫 Teacher: Mr. Ali Misbah</p>
+
+    <div id="quiz-screen" class="card">
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tab-articles" onclick="switchTab('articles')">
+                <span class="tab-title">📘 Articles</span>
+                <div class="tab-stats-row">
+                    <span class="stat-pill done" id="art-done">Done: 0/5</span>
+                    <span class="stat-pill hits" id="art-hits">Correct: 0</span>
+                </div>
+            </button>
+            <button class="tab-btn" id="tab-tags" onclick="switchTab('tags')">
+                <span class="tab-title">🔖 Question Tags</span>
+                <div class="tab-stats-row">
+                    <span class="stat-pill done" id="tag-done">Done: 0/5</span>
+                    <span class="stat-pill hits" id="tag-hits">Correct: 0</span>
+                </div>
+            </button>
+        </div>
+
+        <div class="progress-wrapper">
+            <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
+            <div style="font-weight: 800; color: var(--primary);">Score: <span id="score-live">0</span>/10</div>
+        </div>
+
+        <div id="questions-container" class="questions-grid"></div>
+        <button id="next-tab-btn" class="btn-main" onclick="switchTab('tags')">Next Section: Question Tags →</button>
     </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
+
+    <div id="result-screen" class="card">
+        <div style="font-size: 80px;">🏆</div>
+        <h1 id="rank-slot">Grammar King</h1>
+        <h2 id="final-score"></h2>
+        <div class="result-buttons">
+            <button class="btn-main" onclick="downloadCertificate()" style="background:#6366f1;">📜 Download Certificate</button>
+            <button class="btn-main" onclick="resetQuiz()" style="background:#475569;">🔄 Retry Quiz</button>
+        </div>
     </div>
-  </div>
-
-  <!-- TABS SECTION -->
-  <div class="tabs-wrapper">
-    <button class="tab-btn active" data-tab="articles">📘 Articles (a, an, the, no article)</button>
-    <button class="tab-btn" data-tab="tags">🔖 Question Tags (Present Simple)</button>
-  </div>
-
-  <!-- QUIZ DYNAMIC CONTAINER -->
-  <div id="quiz-container"></div>
-
-  <!-- SIGNATURE SECTION (Text-based, Segoe Script) -->
-  <div class="signature-section">
-    <div class="signature-text">Mr. Ali Misbah</div>
-  </div>
 </div>
 
-<!-- STICKY SCORE -->
-<div class="score-board" id="scoreBoard">⭐ Score: 0 / 10</div>
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+<audio id="snd-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
 <script>
-  // ==========================================
-  // MASTER QUESTION BANK (Articles + Question Tags)
-  // ==========================================
-  const MASTER_QUESTIONS = [
-    // ---------- ARTICLES (5) ----------
-    {
-      id: 0,
-      text: "1. He got his degree from ......... university in London.",
-      options: ["the", "no article", "a", "an"],
-      correctIndex: 2,   // "a"
-      category: "articles"
-    },
-    {
-      id: 1,
-      text: "2. France is ......... European country on the Mediterranean Sea.",
-      options: ["a", "the", "an", "no article"],
-      correctIndex: 0,   // "a"
-      category: "articles"
-    },
-    {
-      id: 2,
-      text: "3. The train can travel at 90 kilometers ......... hour.",
-      options: ["the", "an", "a", "no article"],
-      correctIndex: 1,   // "an" (hour -> vowel sound)
-      category: "articles"
-    },
-    {
-      id: 3,
-      text: "4. They don't need ......... advice from you.",
-      options: ["the", "no article", "an", "a"],
-      correctIndex: 1,   // "no article" (uncountable general)
-      category: "articles"
-    },
-    {
-      id: 4,
-      text: "5. ......... cats are independent animals.",
-      options: ["the", "no article", "a", "an"],
-      correctIndex: 1,   // "no article" (general plural)
-      category: "articles"
-    },
-    // ---------- QUESTION TAGS (5) ----------
-    {
-      id: 5,
-      text: "1. Let's start the lesson, .......... ?",
-      options: ["will you", "shall we", "don't we", "won't you"],
-      correctIndex: 1,   // shall we
-      category: "tags"
-    },
-    {
-      id: 6,
-      text: "2. Open the window, .......... ?",
-      options: ["shall we", "don't you", "will you", "won't we"],
-      correctIndex: 2,   // will you (imperative)
-      category: "tags"
-    },
-    {
-      id: 7,
-      text: "3. He has already left, .......... ?",
-      options: ["hasn't he", "didn't he", "doesn't he", "isn't he"],
-      correctIndex: 0,   // hasn't he
-      category: "tags"
-    },
-    {
-      id: 8,
-      text: "4. She can speak three languages, .......... ?",
-      options: ["did she", "can she", "can't she", "doesn't she"],
-      correctIndex: 2,   // can't she
-      category: "tags"
-    },
-    {
-      id: 9,
-      text: "5. They must follow the rules, .......... ?",
-      options: ["mustn't they", "didn't they", "don't they", "must they"],
-      correctIndex: 0,   // mustn't they
-      category: "tags"
-    }
-  ];
+    const { jsPDF } = window.jspdf;
+    const MASTER_QUESTIONS = [
+        { id: 0, text: "1. He got his degree from ......... university in London.", options: ["the", "no article", "a", "an"], correct: 2, category: "articles" },
+        { id: 1, text: "2. France is ......... European country on the Mediterranean Sea.", options: ["a", "the", "an", "no article"], correct: 0, category: "articles" },
+        { id: 2, text: "3. The train can travel at 90 kilometers ......... hour.", options: ["the", "an", "a", "no article"], correct: 1, category: "articles" },
+        { id: 3, text: "4. They don’t need ......... advice from you.", options: ["the", "no article", "an", "a"], correct: 1, category: "articles" },
+        { id: 4, text: "5. ......... cats are independent animals.", options: ["the", "no article", "a", "an"], correct: 1, category: "articles" },
+        { id: 5, text: "1. Let's start the lesson, .......... ?", options: ["will you", "shall we", "don't we", "won't you"], correct: 1, category: "tags" },
+        { id: 6, text: "2. Open the window, .......... ?", options: ["shall we", "don't you", "will you", "won't we"], correct: 2, category: "tags" },
+        { id: 7, text: "3. He has already left, .......... ?", options: ["hasn't he", "didn't he", "doesn't he", "isn't he"], correct: 0, category: "tags" },
+        { id: 8, text: "4. She can speak three languages, .......... ?", options: ["did she", "can she", "can't she", "doesn't she"], correct: 2, category: "tags" },
+        { id: 9, text: "5. They must follow the rules, .......... ?", options: ["mustn't they", "didn't they", "don't they", "must they"], correct: 0, category: "tags" }
+    ];
 
-  const TOTAL_QS = MASTER_QUESTIONS.length;  // = 10
+    let studentName = "", userAnswers = new Array(10).fill(null), currentTab = "articles";
 
-  // Answer state: stores the selected option index for each question (null = not answered)
-  let userAnswers = new Array(TOTAL_QS).fill(null);
-  
-  // UI state
-  let currentTab = "articles";   // 'articles' or 'tags'
-  let confettiFired = false;
-  
-  // DOM elements
-  const quizContainer = document.getElementById("quiz-container");
-  const progressBar = document.getElementById("progressBar");
-  const scoreBoardEl = document.getElementById("scoreBoard");
-  const tabBtns = document.querySelectorAll(".tab-btn");
-  
-  // ========== HELPER: Update global stats (score, answered count, progress, final confetti) ==========
-  function updateGlobalStatsAndUI() {
-    let answeredCount = 0;
-    let currentScore = 0;
+    function startQuiz() {
+        studentName = document.getElementById('student-name').value.trim();
+        if (!studentName) return alert("Please enter your name!");
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        renderTab();
+    }
     
-    for (let i = 0; i < TOTAL_QS; i++) {
-      if (userAnswers[i] !== null) {
-        answeredCount++;
-        if (userAnswers[i] === MASTER_QUESTIONS[i].correctIndex) {
-          currentScore++;
+    // **NEW FUNCTION: Resets the entire quiz state**
+    function resetQuiz() {
+        studentName = "";
+        userAnswers.fill(null);
+        currentTab = "articles";
+
+        document.getElementById('student-name').value = "";
+        updateStats(); // This will reset all visual counters
+
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'block';
+
+        // Ensure first tab is active
+        document.getElementById('tab-articles').classList.add('active');
+        document.getElementById('tab-tags').classList.remove('active');
+        document.getElementById('next-tab-btn').style.display = 'none';
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('tab-articles').classList.toggle('active', tab === 'articles');
+        document.getElementById('tab-tags').classList.toggle('active', tab === 'tags');
+        document.getElementById('questions-container').scrollTop = 0;
+        document.getElementById('next-tab-btn').style.display = 'none';
+        renderTab();
+    }
+
+    function renderTab() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = "";
+        const filtered = MASTER_QUESTIONS.filter(q => q.category === currentTab);
+        
+        filtered.forEach(q => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `<div class="question-text">${q.text}</div>`;
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                if (userAnswers[q.id] !== null) {
+                    btn.disabled = true;
+                    if (idx === q.correct) btn.classList.add('correct');
+                    if (idx === userAnswers[q.id] && idx !== q.correct) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => handleAnswer(q.id, idx);
+                }
+                card.appendChild(btn);
+            });
+            container.appendChild(card);
+        });
+    }
+
+    function handleAnswer(qId, idx) {
+        userAnswers[qId] = idx;
+        const isCorrect = idx === MASTER_QUESTIONS[qId].correct;
+        document.getElementById(isCorrect ? 'snd-correct' : 'snd-wrong').play();
+        updateStats();
+        renderTab();
+        
+        const articlesDone = userAnswers.slice(0, 5).every(answer => answer !== null);
+        if (articlesDone && currentTab === 'articles') {
+            document.getElementById('next-tab-btn').style.display = 'block';
         }
-      }
+
+        if (!userAnswers.includes(null)) setTimeout(showResults, 1000);
     }
-    
-    // Update progress bar width
-    const percent = (answeredCount / TOTAL_QS) * 100;
-    progressBar.style.width = `${percent}%`;
-    
-    // Update scoreboard text
-    scoreBoardEl.innerHTML = `⭐ Score: ${currentScore} / ${TOTAL_QS}`;
-    
-    // If all questions answered and confetti hasn't fired yet, celebrate!
-    if (answeredCount === TOTAL_QS && !confettiFired) {
-      confettiFired = true;
-      scoreBoardEl.style.background = "#10b981";
-      scoreBoardEl.style.boxShadow = "0 0 18px #10b98180";
-      scoreBoardEl.innerHTML = `🎉 FINAL SCORE: ${currentScore} / ${TOTAL_QS} 🎉`;
-      shootConfettiExplosion();
-    } else if (answeredCount !== TOTAL_QS) {
-      // keep original dark theme if not completed
-      scoreBoardEl.style.background = "#1e293b";
-      scoreBoardEl.style.boxShadow = "0 12px 30px rgba(0, 0, 0, 0.3)";
+
+    function updateStats() {
+        const getStats = (cat) => {
+            const qs = MASTER_QUESTIONS.filter(q => q.category === cat);
+            const done = qs.filter(q => userAnswers[q.id] !== null).length;
+            const hits = qs.filter(q => userAnswers[q.id] !== null && userAnswers[q.id] === q.correct).length;
+            return { done, hits, total: qs.length };
+        };
+
+        const art = getStats('articles');
+        const tag = getStats('tags');
+
+        document.getElementById('art-done').innerText = `Done: ${art.done}/${art.total}`;
+        document.getElementById('art-hits').innerText = `Correct: ${art.hits}`;
+        document.getElementById('tag-done').innerText = `Done: ${tag.done}/${tag.total}`;
+        document.getElementById('tag-hits').innerText = `Correct: ${tag.hits}`;
+
+        const totalScore = art.hits + tag.hits;
+        const totalDone = art.done + tag.done;
+        document.getElementById('score-live').innerText = totalScore;
+        document.getElementById('p-bar').style.width = (totalDone * 10) + "%";
     }
-    
-    return { answeredCount, currentScore };
-  }
-  
-  // ========== CONFETTI CELEBRATION ==========
-  function shootConfettiExplosion() {
-    const duration = 2500;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 28, spread: 380, ticks: 70, zIndex: 9999, colors: ['#3b82f6', '#10b981', '#facc15', '#ef4444'] };
-    
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
+
+    function showResults() {
+        const score = userAnswers.filter((a, i) => a === MASTER_QUESTIONS[i].correct).length;
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `Score: ${score} / 10`;
+        document.getElementById('rank-slot').innerText = score === 10 ? "Grammar King" : score >= 8 ? "English Expert" : "Learner";
+        document.getElementById('snd-win').play();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
-    
-    const interval = setInterval(function() {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-      const particleCount = 40 * (timeLeft / duration);
-      // left side
-      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-      // right side
-      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-      // middle extra
-      confetti(Object.assign({}, defaults, { particleCount: particleCount * 0.8, origin: { x: 0.5, y: Math.random() * 0.5 } }));
-    }, 200);
-  }
-  
-  // ========== RENDER ACTIVE TAB (Articles OR Question Tags) ==========
-  function renderCurrentTab() {
-    // Filter questions based on currentTab
-    const filteredQuestions = MASTER_QUESTIONS.filter(q => q.category === currentTab);
-    
-    if (!quizContainer) return;
-    quizContainer.innerHTML = "";
-    
-    // Iterate over filtered questions and build cards
-    filteredQuestions.forEach(question => {
-      const globalIdx = question.id;   // original index in master array
-      const answeredSelection = userAnswers[globalIdx];
-      const isAnswered = (answeredSelection !== null);
-      const correctIdx = question.correctIndex;
-      
-      // Create card
-      const card = document.createElement("div");
-      card.className = "question-card";
-      
-      // Question title
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "question-title";
-      titleDiv.innerText = question.text;
-      card.appendChild(titleDiv);
-      
-      // Options grid
-      const optionsGrid = document.createElement("div");
-      optionsGrid.className = "options-grid";
-      
-      // Loop through options
-      question.options.forEach((optText, optIndex) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        
-        // Prepare inner spans
-        const textSpan = document.createElement("span");
-        textSpan.innerText = optText;
-        const iconSpan = document.createElement("span");
-        iconSpan.className = "icon";
-        iconSpan.innerText = "";   // empty by default
-        
-        btn.appendChild(textSpan);
-        btn.appendChild(iconSpan);
-        
-        // If question already answered: show correct/wrong styling, disable, add icons
-        if (isAnswered) {
-          btn.disabled = true;
-          // highlight correct answer for all buttons
-          if (optIndex === correctIdx) {
-            btn.classList.add("correct");
-            iconSpan.innerText = "✅";
-          }
-          // If this button is the user's selected answer AND it's incorrect -> show wrong style & cross
-          if (optIndex === answeredSelection && answeredSelection !== correctIdx) {
-            btn.classList.add("wrong");
-            iconSpan.innerText = "❌";
-          }
-          // Edge: if user selected correct answer, the correct button already has checkmark; no additional cross.
-          // Also if selected correct, the correct button gets check and correct class.
-        } else {
-          // Not answered yet: attach click handler
-          btn.disabled = false;
-          btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            // prevent re-answering
-            if (userAnswers[globalIdx] !== null) return;
-            // record answer
-            userAnswers[globalIdx] = optIndex;
-            // update stats & progress + re-render current tab to reflect correct/wrong highlights
-            updateGlobalStatsAndUI();
-            renderCurrentTab();   // refresh current tab view (shows feedback)
-          });
-        }
-        
-        optionsGrid.appendChild(btn);
-      });
-      
-      card.appendChild(optionsGrid);
-      quizContainer.appendChild(card);
-    });
-    
-    // If no questions in category? impossible, but safe
-    if (filteredQuestions.length === 0) {
-      quizContainer.innerHTML = "<div style='text-align:center;padding:40px;background:white;border-radius:28px;'>✨ No questions in this section ✨</div>";
+
+    function downloadCertificate() {
+        const score = userAnswers.filter((a, i) => a === MASTER_QUESTIONS[i].correct).length;
+        const doc = new jsPDF({ orientation: 'landscape' });
+        doc.setDrawColor(59, 130, 246); doc.setLineWidth(5); doc.rect(10, 10, 277, 190);
+        try {
+            doc.addImage(document.getElementById('logo-neu'), 'PNG', 20, 20, 40, 20);
+            doc.addImage(document.getElementById('logo-lights'), 'PNG', 230, 20, 40, 20);
+        } catch(e) {}
+        doc.setFont("helvetica", "bold"); doc.setFontSize(35); doc.text("CERTIFICATE OF ACHIEVEMENT", 148, 65, { align: "center" });
+        doc.setFontSize(20); doc.setFont("helvetica", "normal"); doc.text("Presented to:", 148, 85, { align: "center" });
+        doc.setFontSize(32); doc.setTextColor(59, 130, 246); doc.text(studentName.toUpperCase(), 148, 110, { align: "center" });
+        doc.setTextColor(30, 41, 59); doc.setFontSize(18); doc.text(`Final Result: ${score} / 10`, 148, 135, { align: "center" });
+        doc.text(`Finished the Quiz on date: ${new Date().toLocaleDateString()}`, 148, 148, { align: "center" });
+        doc.setFont("times", "italic"); doc.setFontSize(24); doc.text("Mr. Ali Misbah", 148, 175, { align: "center" });
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("__________________________", 148, 178, { align: "center" });
+        doc.text("English Teacher", 148, 185, { align: "center" });
+        doc.save(`${studentName}_Certificate.pdf`);
     }
-  }
-  
-  // ========== HANDLE TAB SWITCHING ==========
-  function switchTab(tabId) {
-    currentTab = tabId;
-    // update active styles on buttons
-    tabBtns.forEach(btn => {
-      const btnTab = btn.getAttribute("data-tab");
-      if (btnTab === tabId) {
-        btn.classList.add("active");
-      } else {
-        btn.classList.remove("active");
-      }
-    });
-    // re-render the current tab content
-    renderCurrentTab();
-  }
-  
-  // ========== EVENT LISTENERS FOR TABS ==========
-  tabBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tabValue = btn.getAttribute("data-tab");
-      if (tabValue === "articles") switchTab("articles");
-      else if (tabValue === "tags") switchTab("tags");
-    });
-  });
-  
-  // ========== INITIAL LOAD & RESET (optional but fresh start) ==========
-  function initQuiz() {
-    // reset answer state (fresh start for all 10 questions)
-    userAnswers.fill(null);
-    confettiFired = false;
-    // Reset scoreboard style
-    scoreBoardEl.style.background = "#1e293b";
-    // reset progress bar
-    progressBar.style.width = "0%";
-    // initial score display
-    updateGlobalStatsAndUI();
-    // start with articles tab
-    currentTab = "articles";
-    // ensure tab UI active matches
-    tabBtns.forEach(btn => {
-      if (btn.getAttribute("data-tab") === "articles") btn.classList.add("active");
-      else btn.classList.remove("active");
-    });
-    renderCurrentTab();
-  }
-  
-  // trigger initialization
-  initQuiz();
 </script>
 </body>
 </html>
