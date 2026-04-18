@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Grade 8 Vocabulary Mastery | Mr. Ali Misbah</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f1f4ff 0%, #e4e9fc 100%);
+            margin: 0;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+            padding: 28px 32px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        #quiz-screen, #result-screen {
+            display: none;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            height: 58px;
+            object-fit: contain;
+        }
+
+        /* TABS STYLE (3 tabs) */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 60px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            background: transparent;
+            color: #475569;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #4f46e5;
+            box-shadow: 0 8px 20px rgba(79,70,229,0.15);
+        }
+        .tab-title {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+        .tab-stats-row {
+            display: flex;
+            gap: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .stat-pill {
+            background: #e2e8f0;
+            padding: 3px 10px;
+            border-radius: 40px;
+        }
+        .tab-btn.active .stat-pill {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .progress-wrapper {
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .progress-container {
+            flex: 1;
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border-radius: 20px;
+        }
+        .stats-text {
+            font-weight: 700;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+        .stats-text span {
+            color: #4f46e5;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            max-height: 54vh;
+            overflow-y: auto;
+            padding: 6px 4px 12px 4px;
+            scroll-behavior: smooth;
+        }
+        .question-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 20px 24px;
+            border: 1px solid #eef2ff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .question-text {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 18px;
+            line-height: 1.4;
+            padding-left: 14px;
+            border-left: 5px solid #8b5cf6;
+            color: #0f172a;
+        }
+        .options-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .option-btn {
+            flex: 1 0 calc(50% - 12px);
+            min-width: 170px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 10px 14px;
+            border-radius: 40px;
+            font-family: 'Inter', monospace;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.12s;
+            text-align: left;
+            color: #1e293b;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #cbd5e1;
+            transform: scale(0.97);
+        }
+        .correct {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #14532d;
+        }
+        .wrong {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+            text-decoration: line-through;
+        }
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        .btn-main {
+            background: linear-gradient(105deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+        }
+        .btn-main:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+        }
+        .btn-secondary {
+            background: #334155;
+            box-shadow: none;
+        }
+        input {
+            width: 85%;
+            padding: 14px 20px;
+            border-radius: 60px;
+            border: 2px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            background: #fefefe;
+            margin-bottom: 20px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
+        }
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        .subhead {
+            color: #475569;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            color: #64748b;
+        }
+        @media (max-width: 680px) {
+            .card { padding: 20px; }
+            .option-btn { flex: 1 0 100%; }
+            .tabs-container { flex-direction: column; border-radius: 40px; gap: 8px; }
+            .tab-btn { flex-direction: row; justify-content: center; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="card">
+        <div class="logos-container">
+            <img src="neu-logo.png" class="logo" id="logo-neu" alt="logo" onerror="this.style.display='none'">
+            <img src="lights-logo.png" class="logo" id="logo-lights" alt="logo" onerror="this.style.display='none'">
+        </div>
+        <h1>📖 Grade 8 Vocabulary Quiz</h1>
+        <div class="subhead">Three Challenge Sets | Unit 7 Vocabulary</div>
+        <p style="margin-bottom: 16px;">Teacher: Mr. Ali Misbah</p>
+        <input type="text" id="student-name" placeholder="Enter your full name" autocomplete="off">
+        <br>
+        <button class="btn-main" onclick="startQuiz()">✨ Begin Quiz ✨</button>
+        <footer>20 questions across 3 tabs | certificate ready</footer>
+    </div>
+
+    <!-- QUIZ SCREEN (with tabs) -->
+    <div id="quiz-screen" class="card">
+        <div class="tabs-container" id="tabs-bar">
+            <button class="tab-btn active" data-tab="quiz1" onclick="switchTab('quiz1')">
+                <span class="tab-title">📘 Quiz 1</span>
+                <div class="tab-stats-row">
+                    <span class="stat-pill" id="stat-quiz1-done">0/7</span>
+                    <span class="stat-pill" id="stat-quiz1-correct">0</span>
+                </div>
+            </button>
+            <button class="tab-btn" data-tab="quiz2" onclick="switchTab('quiz2')">
+                <span class="tab-title">📗 Quiz 2</span>
+                <div class="tab-stats-row">
+                    <span class="stat-pill" id="stat-quiz2-done">0/7</span>
+                    <span class="stat-pill" id="stat-quiz2-correct">0</span>
+                </div>
+            </button>
+            <button class="tab-btn" data-tab="quiz3" onclick="switchTab('quiz3')">
+                <span class="tab-title">📙 Quiz 3</span>
+                <div class="tab-stats-row">
+                    <span class="stat-pill" id="stat-quiz3-done">0/6</span>
+                    <span class="stat-pill" id="stat-quiz3-correct">0</span>
+                </div>
+            </button>
+        </div>
+
+        <div class="progress-wrapper">
+            <div class="progress-container"><div class="progress-bar" id="global-progress"></div></div>
+            <div class="stats-text">🏆 Total Score: <span id="total-score-span">0</span> / <span id="total-questions-count">20</span></div>
+        </div>
+
+        <div id="questions-container" class="questions-grid"></div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="card">
+        <div style="font-size: 70px; text-align:center;">🎓</div>
+        <h1 id="rank-slot" style="text-align:center;">Vocabulary Master</h1>
+        <h2 id="final-score" style="text-align:center; margin: 10px 0;"></h2>
+        <div class="result-buttons">
+            <button class="btn-main" onclick="downloadCertificate()" style="background:#0f172a;">📜 Download Certificate</button>
+            <button class="btn-main btn-secondary" onclick="resetFullQuiz()">🔄 Retry Quiz</button>
+        </div>
+    </div>
+</div>
+
+<!-- Audio (optional) -->
+<audio id="snd-correct" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+<audio id="snd-win" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+<script>
+    const { jsPDF } = window.jspdf;
+    
+    // ======================= GRADE 8 QUESTIONS (3 QUIZZES) =======================
+    const QUESTIONS_DB = [
+        // QUIZ 1 (7 questions)
+        { id: 0, text: "1. The team members packed their clothes in a large ………… before traveling.", options: ["headsets", "substitutes", "suitcases", "advantages"], correct: 2, quiz: "quiz1" },
+        { id: 1, text: "2. The story was ………… touching and emotional.", options: ["abroad", "significantly", "carefully", "independently"], correct: 1, quiz: "quiz1" },
+        { id: 2, text: "3. The new system will ………… students to study online.", options: ["display", "involve", "enable", "experience"], correct: 2, quiz: "quiz1" },
+        { id: 3, text: "4. I enjoy trying foreign ………… to get an idea about others’ foods.", options: ["cuisine", "background", "fossils", "greeting"], correct: 0, quiz: "quiz1" },
+        { id: 4, text: "5. Hana worked hard to ………… respect.", options: ["deepen", "broaden", "gain", "enrich"], correct: 2, quiz: "quiz1" },
+        { id: 5, text: "6. Good ………… is important in formal meetings.", options: ["background", "cuisine", "etiquette", "enjoyment"], correct: 2, quiz: "quiz1" },
+        { id: 6, text: "7. Daily practice can ………… your understanding.", options: ["bow", "weaken", "socialize", "deepen"], correct: 3, quiz: "quiz1" },
+        
+        // QUIZ 2 (7 questions)
+        { id: 7, text: "1. In Japan, people often ………… to show respect.", options: ["broaden", "gain", "enrich", "bow"], correct: 3, quiz: "quiz2" },
+        { id: 8, text: "2. The trip was truly ………… .", options: ["historical", "ancient", "national", "unforgettable"], correct: 3, quiz: "quiz2" },
+        { id: 9, text: "3. Travelling can ………… your life experience.", options: ["bow", "deepen", "weaken", "hide"], correct: 1, quiz: "quiz2" },
+        { id: 10, text: "4. It is important to ………… with classmates.", options: ["socialize", "deepen", "enrich", "gain"], correct: 0, quiz: "quiz2" },
+        { id: 11, text: "5. Scientists examine dinosaur ………… carefully.", options: ["greeting", "etiquette", "fossils", "cuisine"], correct: 2, quiz: "quiz2" },
+        { id: 12, text: "6. The system has ………… increased the number of users.", options: ["abroad", "quietly", "gladly", "significantly"], correct: 3, quiz: "quiz2" },
+        { id: 13, text: "7. The team felt proud of their ………… anthem.", options: ["historical", "ancient", "national", "unforgettable"], correct: 2, quiz: "quiz2" },
+        
+        // QUIZ 3 (6 questions)
+        { id: 14, text: "1. The organization received a generous _______ to support its environmental programs.", options: ["depression", "cuisine", "contribution", "fossil"], correct: 2, quiz: "quiz3" },
+        { id: 15, text: "2. He prefers to ……………….. with close friends only.", options: ["demonstrate", "socialise", "bow", "weaken"], correct: 1, quiz: "quiz3" },
+        { id: 16, text: "3. The pandemic made it _______ for everyone to wear masks in public places.", options: ["emotional", "remote", "generous", "necessary"], correct: 3, quiz: "quiz3" },
+        { id: 17, text: "4. The elderly resident _______ agreed to volunteer at the local shelter.", options: ["gladly", "independently", "sincerely", "unfairly"], correct: 0, quiz: "quiz3" },
+        { id: 18, text: "5. Understanding different viewpoints requires a lot of _______ and trustworthiness.", options: ["disaster", "empathy", "greeting", "enjoyment"], correct: 1, quiz: "quiz3" },
+        { id: 19, text: "6. The psychologist tried to ______ the patient that honesty leads to better mental health.", options: ["define", "bow", "persuade", "socialise"], correct: 2, quiz: "quiz3" }
+    ];
+    
+    const TOTAL_QS = QUESTIONS_DB.length;
+    let studentName = "";
+    let userAnswers = new Array(TOTAL_QS).fill(null);   // stores selected option index
+    let currentTab = "quiz1";   // 'quiz1', 'quiz2', 'quiz3'
+    
+    // Helper: compute stats per quiz and overall
+    function computeStats() {
+        let quizStats = { quiz1: { total: 0, done: 0, correct: 0 }, quiz2: { total: 0, done: 0, correct: 0 }, quiz3: { total: 0, done: 0, correct: 0 } };
+        let overallCorrect = 0, overallDone = 0;
+        QUESTIONS_DB.forEach(q => {
+            const quiz = q.quiz;
+            quizStats[quiz].total++;
+            const ans = userAnswers[q.id];
+            const isAnswered = ans !== null;
+            if (isAnswered) {
+                quizStats[quiz].done++;
+                overallDone++;
+                const isRight = (ans === q.correct);
+                if (isRight) {
+                    quizStats[quiz].correct++;
+                    overallCorrect++;
+                }
+            }
+        });
+        return { quizStats, overallCorrect, overallDone };
+    }
+    
+    function updateUIStats() {
+        const { quizStats, overallCorrect, overallDone } = computeStats();
+        // update tab badges
+        document.getElementById('stat-quiz1-done').innerText = `${quizStats.quiz1.done}/${quizStats.quiz1.total}`;
+        document.getElementById('stat-quiz1-correct').innerText = `${quizStats.quiz1.correct}`;
+        document.getElementById('stat-quiz2-done').innerText = `${quizStats.quiz2.done}/${quizStats.quiz2.total}`;
+        document.getElementById('stat-quiz2-correct').innerText = `${quizStats.quiz2.correct}`;
+        document.getElementById('stat-quiz3-done').innerText = `${quizStats.quiz3.done}/${quizStats.quiz3.total}`;
+        document.getElementById('stat-quiz3-correct').innerText = `${quizStats.quiz3.correct}`;
+        
+        // overall score & progress bar
+        document.getElementById('total-score-span').innerText = overallCorrect;
+        const percent = (overallDone / TOTAL_QS) * 100;
+        document.getElementById('global-progress').style.width = percent + "%";
+        
+        return { overallCorrect, overallDone };
+    }
+    
+    // Render current tab's questions
+    function renderCurrentTab() {
+        const container = document.getElementById('questions-container');
+        if (!container) return;
+        const filtered = QUESTIONS_DB.filter(q => q.quiz === currentTab);
+        container.innerHTML = "";
+        
+        filtered.forEach(q => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = q.text;
+            card.appendChild(qText);
+            
+            const optsDiv = document.createElement('div');
+            optsDiv.className = 'options-area';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = `${String.fromCharCode(65+idx)}. ${opt}`;
+                const isAnswered = userAnswers[q.id] !== null;
+                if (isAnswered) {
+                    btn.disabled = true;
+                    if (idx === q.correct) btn.classList.add('correct');
+                    if (idx === userAnswers[q.id] && idx !== q.correct) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => handleAnswer(q.id, idx);
+                }
+                optsDiv.appendChild(btn);
+            });
+            card.appendChild(optsDiv);
+            container.appendChild(card);
+        });
+    }
+    
+    function handleAnswer(qId, selectedIdx) {
+        if (userAnswers[qId] !== null) return;
+        const question = QUESTIONS_DB.find(q => q.id === qId);
+        const isCorrect = (selectedIdx === question.correct);
+        const sound = document.getElementById(isCorrect ? 'snd-correct' : 'snd-wrong');
+        if (sound) sound.play().catch(e=>{});
+        userAnswers[qId] = selectedIdx;
+        
+        // re-render current tab to show feedback
+        renderCurrentTab();
+        const { overallDone } = updateUIStats();
+        
+        // auto-check if all questions are answered
+        if (overallDone === TOTAL_QS) {
+            setTimeout(() => showResultsScreen(), 500);
+        }
+    }
+    
+    function switchTab(tabId) {
+        currentTab = tabId;
+        // update active class on buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === tabId) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        renderCurrentTab();
+    }
+    
+    // start quiz from welcome
+    function startQuiz() {
+        const nameInput = document.getElementById('student-name');
+        const raw = nameInput.value.trim();
+        if (raw === "") {
+            alert("Please enter your name to continue.");
+            return;
+        }
+        studentName = raw;
+        userAnswers = new Array(TOTAL_QS).fill(null);
+        // reset UI
+        updateUIStats();
+        renderCurrentTab();
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('result-screen').style.display = 'none';
+        // ensure first tab active
+        currentTab = "quiz1";
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === 'quiz1') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        renderCurrentTab();
+    }
+    
+    function showResultsScreen() {
+        const { overallCorrect } = computeStats();
+        const percent = Math.round((overallCorrect / TOTAL_QS) * 100);
+        let rank = "";
+        if (overallCorrect === TOTAL_QS) rank = "🏅 VOCABULARY LEGEND 🏅";
+        else if (overallCorrect >= 16) rank = "🌟 Word Master 🌟";
+        else if (overallCorrect >= 12) rank = "📚 Skilled Learner";
+        else rank = "📖 Keep Building Vocabulary!";
+        document.getElementById('rank-slot').innerHTML = rank;
+        document.getElementById('final-score').innerHTML = `🎯 Score: ${overallCorrect} / ${TOTAL_QS}  (${percent}%)`;
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        const win = document.getElementById('snd-win');
+        if (win) win.play().catch(e=>{});
+        canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: ['#4f46e5', '#f59e0b', '#10b981'] });
+    }
+    
+    function resetFullQuiz() {
+        studentName = "";
+        userAnswers = new Array(TOTAL_QS).fill(null);
+        document.getElementById('student-name').value = "";
+        document.getElementById('welcome-screen').style.display = 'block';
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'none';
+        updateUIStats();
+        // reset progress
+        document.getElementById('global-progress').style.width = "0%";
+    }
+    
+    function downloadCertificate() {
+        if (!studentName) {
+            const fallback = document.getElementById('student-name')?.value.trim();
+            if (fallback) studentName = fallback;
+            else studentName = "Dedicated Student";
+        }
+        const { overallCorrect } = computeStats();
+        const percent = Math.round((overallCorrect / TOTAL_QS) * 100);
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const w = 297, h = 210;
+        doc.setFillColor(248, 250, 255);
+        doc.rect(0, 0, w, h, 'F');
+        doc.setDrawColor(79, 70, 229);
+        doc.setLineWidth(2);
+        doc.rect(10, 10, w - 20, h - 20);
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(32);
+        doc.setTextColor(30, 41, 59);
+        doc.text("CERTIFICATE OF ACHIEVEMENT", w/2, 55, { align: "center" });
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(18);
+        doc.setTextColor(71, 85, 105);
+        doc.text("This certificate is awarded to", w/2, 80, { align: "center" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(34);
+        doc.setTextColor(79, 70, 229);
+        doc.text(studentName.toUpperCase(), w/2, 110, { align: "center" });
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(16);
+        doc.setTextColor(51, 65, 85);
+        doc.text(`for mastering Grade 8 Vocabulary (3 quizzes)`, w/2, 138, { align: "center" });
+        doc.setFontSize(20);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(22, 163, 74);
+        doc.text(`Final Score: ${overallCorrect} / ${TOTAL_QS}  ·  ${percent}%`, w/2, 165, { align: "center" });
+        
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, w/2, 185, { align: "center" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Mr. Ali Misbah", w/2, 200, { align: "center" });
+        doc.setFontSize(10);
+        doc.text("English Language Teacher", w/2, 206, { align: "center" });
+        
+        doc.save(`${studentName.replace(/\s/g, "_")}_Grade8_Vocab_Certificate.pdf`);
+    }
+    
+    // initial setup
+    document.getElementById('total-questions-count').innerText = TOTAL_QS;
+    window.startQuiz = startQuiz;
+    window.switchTab = switchTab;
+    window.resetFullQuiz = resetFullQuiz;
+    window.downloadCertificate = downloadCertificate;
+    
+    // optional: preload
+    console.log("Grade 8 quiz ready with 3 tabs");
+</script>
+</body>
+</html>
