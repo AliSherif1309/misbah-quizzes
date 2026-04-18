@@ -60,6 +60,51 @@
             object-fit: contain;
         }
 
+        /* TABS STYLE */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 60px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            background: transparent;
+            color: #475569;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #0f766e;
+            box-shadow: 0 8px 20px rgba(15,118,110,0.15);
+        }
+        .tab-stats {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .tab-btn.active .tab-stats {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+
         .progress-wrapper {
             background: #f1f5f9;
             padding: 12px 20px;
@@ -239,6 +284,8 @@
             .card { padding: 20px; }
             .option-btn { flex: 1 0 100%; }
             .progress-wrapper { flex-direction: column; align-items: stretch; }
+            .tabs-container { flex-direction: column; gap: 8px; }
+            .tab-btn { justify-content: space-between; }
         }
     </style>
 </head>
@@ -256,14 +303,26 @@
         <input type="text" id="student-name" placeholder="Enter your full name" autocomplete="off">
         <br>
         <button class="btn-main" onclick="initiateQuiz()">✨ Start Quiz ✨</button>
-        <footer>8 questions | instant feedback | certificate included</footer>
+        <footer>8 questions across 2 tabs | instant feedback | certificate included</footer>
     </div>
 
-    <!-- QUIZ SCREEN (single set, no tabs) -->
+    <!-- QUIZ SCREEN (with tabs) -->
     <div id="quiz-screen" class="card">
         <div class="logos-container" style="margin-bottom: 8px;">
             <div style="font-weight:800; background:#e6f7f5; padding:5px 15px; border-radius:40px;">⭐ Grade 7 Challenge</div>
             <div style="font-size:0.8rem;">🎯 Mr. Ali Misbah</div>
+        </div>
+
+        <!-- TABS BAR -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="usedto" onclick="switchTab('usedto')">
+                📝 Used to + Gerund
+                <span class="tab-stats" id="usedto-stats">0/4 ✅ 0</span>
+            </button>
+            <button class="tab-btn" data-tab="prepositions" onclick="switchTab('prepositions')">
+                🧭 Prepositions of Movement
+                <span class="tab-stats" id="prepositions-stats">0/4 ✅ 0</span>
+            </button>
         </div>
         
         <div class="progress-wrapper">
@@ -271,7 +330,7 @@
                 <div class="progress-bar" id="p-bar"></div>
             </div>
             <div class="stats-text" id="live-stats">
-                📊 Score: <span id="score-live">0</span> / <span id="total-qty">8</span> &nbsp;| ✅ Answered: <span id="answered-count">0</span>/8
+                📊 Total Score: <span id="score-live">0</span> / <span id="total-qty">8</span> &nbsp;| ✅ Answered: <span id="answered-count">0</span>/8
             </div>
         </div>
 
@@ -298,22 +357,23 @@
 <script>
     const { jsPDF } = window.jspdf;
     
-    // ======================= GRADE 7 QUESTIONS (exactly as provided) =======================
+    // ======================= GRADE 7 QUESTIONS WITH CATEGORIES =======================
     const MASTER_QUESTIONS = [
-        { id: 0, text: "1. I am used to …………… English daily.", options: ["speaks", "spoke", "speaking", "speak"], correct: 2 },
-        { id: 1, text: "2. My brothers …………… used to swimming in the sea.", options: ["is", "are", "am", "be"], correct: 1 },
-        { id: 2, text: "3. Is Hamad used to …………… at night?", options: ["study", "studying", "studies", "studied"], correct: 1 },
-        { id: 3, text: "4. I am used to …………… my teeth before bed.", options: ["brush", "brushed", "brushing", "brushes"], correct: 2 },
-        { id: 4, text: "5. The boy threw the ball ................ his friend.", options: ["over", "into", "around", "towards"], correct: 3 },
-        { id: 5, text: "6. The swimmer dived ................ the swimming pool.", options: ["through", "across", "over", "into"], correct: 3 },
-        { id: 6, text: "7. The plane flew ................ the mountains.", options: ["around", "into", "over", "through"], correct: 2 },
-        { id: 7, text: "8. The man walked ................ the forest for hours.", options: ["through", "over", "across", "into"], correct: 0 }
+        { id: 0, text: "1. I am used to …………… English daily.", options: ["speaks", "spoke", "speaking", "speak"], correct: 2, category: "usedto" },
+        { id: 1, text: "2. My brothers …………… used to swimming in the sea.", options: ["is", "are", "am", "be"], correct: 1, category: "usedto" },
+        { id: 2, text: "3. Is Hamad used to …………… at night?", options: ["study", "studying", "studies", "studied"], correct: 1, category: "usedto" },
+        { id: 3, text: "4. I am used to …………… my teeth before bed.", options: ["brush", "brushed", "brushing", "brushes"], correct: 2, category: "usedto" },
+        { id: 4, text: "5. The boy threw the ball ................ his friend.", options: ["over", "into", "around", "towards"], correct: 3, category: "prepositions" },
+        { id: 5, text: "6. The swimmer dived ................ the swimming pool.", options: ["through", "across", "over", "into"], correct: 3, category: "prepositions" },
+        { id: 6, text: "7. The plane flew ................ the mountains.", options: ["around", "into", "over", "through"], correct: 2, category: "prepositions" },
+        { id: 7, text: "8. The man walked ................ the forest for hours.", options: ["through", "over", "across", "into"], correct: 0, category: "prepositions" }
     ];
     const TOTAL_QS = MASTER_QUESTIONS.length;
     
     // Global state
     let studentName = "";
     let userAnswers = new Array(TOTAL_QS).fill(null);
+    let currentTab = "usedto";   // 'usedto' or 'prepositions'
     
     // DOM elements
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -325,29 +385,55 @@
     const answeredCountSpan = document.getElementById('answered-count');
     const totalQtySpan = document.getElementById('total-qty');
     
-    // Helper: update stats (score, answered, progress bar)
-    function updateGlobalStats() {
-        let correctCount = 0;
-        let answered = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null) {
-                answered++;
-                if (userAnswers[i] === MASTER_QUESTIONS[i].correct) correctCount++;
-            }
-        }
-        if (scoreLiveSpan) scoreLiveSpan.innerText = correctCount;
-        if (answeredCountSpan) answeredCountSpan.innerText = answered;
-        const percentComplete = (answered / TOTAL_QS) * 100;
-        progressBar.style.width = percentComplete + "%";
-        return { correctCount, answered };
-    }
-    
-    // render all questions dynamically with current answers
-    function renderAllQuestions() {
-        if (!questionsContainer) return;
-        questionsContainer.innerHTML = "";
+    // Helper: compute stats per category and overall
+    function computeStats() {
+        let usedtoDone = 0, usedtoCorrect = 0;
+        let prepDone = 0, prepCorrect = 0;
+        let overallCorrect = 0, overallDone = 0;
         
         MASTER_QUESTIONS.forEach(q => {
+            const ans = userAnswers[q.id];
+            const isAnswered = ans !== null;
+            if (isAnswered) {
+                overallDone++;
+                const isRight = (ans === q.correct);
+                if (isRight) overallCorrect++;
+                
+                if (q.category === "usedto") {
+                    usedtoDone++;
+                    if (isRight) usedtoCorrect++;
+                } else {
+                    prepDone++;
+                    if (isRight) prepCorrect++;
+                }
+            }
+        });
+        
+        return { usedtoDone, usedtoCorrect, prepDone, prepCorrect, overallCorrect, overallDone };
+    }
+    
+    function updateUIStats() {
+        const stats = computeStats();
+        // Update tab badges
+        document.getElementById('usedto-stats').innerHTML = `${stats.usedtoDone}/4 ✅ ${stats.usedtoCorrect}`;
+        document.getElementById('prepositions-stats').innerHTML = `${stats.prepDone}/4 ✅ ${stats.prepCorrect}`;
+        
+        // Update overall progress
+        if (scoreLiveSpan) scoreLiveSpan.innerText = stats.overallCorrect;
+        if (answeredCountSpan) answeredCountSpan.innerText = stats.overallDone;
+        const percentComplete = (stats.overallDone / TOTAL_QS) * 100;
+        progressBar.style.width = percentComplete + "%";
+        
+        return stats;
+    }
+    
+    // Render questions for current tab only
+    function renderCurrentTab() {
+        if (!questionsContainer) return;
+        const filtered = MASTER_QUESTIONS.filter(q => q.category === currentTab);
+        questionsContainer.innerHTML = "";
+        
+        filtered.forEach(q => {
             const card = document.createElement('div');
             card.className = 'question-card';
             const questionDiv = document.createElement('div');
@@ -361,7 +447,7 @@
             q.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = `${String.fromCharCode(97+idx)}) ${opt}`;  // a), b), c) ...
+                btn.innerText = `${String.fromCharCode(97+idx)}) ${opt}`;
                 const isAnswered = userAnswers[q.id] !== null;
                 if (isAnswered) {
                     btn.disabled = true;
@@ -377,7 +463,7 @@
         });
     }
     
-    // handle answer selection
+    // Handle answer selection
     function handleAnswer(questionId, selectedIdx) {
         if (userAnswers[questionId] !== null) return;
         
@@ -386,41 +472,29 @@
         if (sound) sound.play().catch(e => console.log("audio blocked"));
         
         userAnswers[questionId] = selectedIdx;
-        renderAllQuestions();
         
-        const { answered } = updateGlobalStats();
+        // Re-render current tab to show feedback
+        renderCurrentTab();
+        const stats = updateUIStats();
         
-        // if all questions answered, show results after short delay
-        if (answered === TOTAL_QS) {
-            setTimeout(() => {
-                showFinalResults();
-            }, 400);
+        // If all questions answered, show results
+        if (stats.overallDone === TOTAL_QS) {
+            setTimeout(() => showFinalResults(), 400);
         }
     }
     
-    // Final results & confetti
-    function showFinalResults() {
-        let correctCount = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null && userAnswers[i] === MASTER_QUESTIONS[i].correct) correctCount++;
-        }
-        const scorePercent = Math.round((correctCount / TOTAL_QS) * 100);
-        
-        let rankText = "";
-        if (correctCount === TOTAL_QS) rankText = "🏆 PERFECT GRAMMAR LEGEND 🏆";
-        else if (correctCount >= 6) rankText = "🌟 English Pro 🌟";
-        else rankText = "📖 Keen Learner – Keep Growing!";
-        
-        document.getElementById('rank-slot').innerHTML = rankText;
-        document.getElementById('final-score').innerHTML = `🎯 Score: ${correctCount} / ${TOTAL_QS}  (${scorePercent}%)`;
-        
-        quizScreen.style.display = 'none';
-        resultScreen.style.display = 'block';
-        
-        const winAudio = document.getElementById('snd-win');
-        if (winAudio) winAudio.play().catch(e=>console.log);
-        canvasConfetti({ particleCount: 220, spread: 85, origin: { y: 0.6 }, colors: ['#0f766e', '#f59e0b', '#10b981'] });
-        canvasConfetti({ particleCount: 70, spread: 120, origin: { y: 0.4, x: 0.3 }, startVelocity: 15 });
+    // Switch between tabs
+    function switchTab(tab) {
+        currentTab = tab;
+        // Update active class on buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === tab) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        renderCurrentTab();
     }
     
     // Initialize quiz from welcome screen
@@ -434,8 +508,9 @@
         studentName = rawName;
         userAnswers = new Array(TOTAL_QS).fill(null);
         
-        updateGlobalStats();
-        renderAllQuestions();
+        // Reset UI
+        updateUIStats();
+        renderCurrentTab();
         
         welcomeScreen.style.display = 'none';
         quizScreen.style.display = 'block';
@@ -444,7 +519,29 @@
         if (questionsContainer) questionsContainer.scrollTop = 0;
     }
     
-    // Reset everything (back to welcome)
+    // Show final results with confetti
+    function showFinalResults() {
+        const stats = computeStats();
+        const scorePercent = Math.round((stats.overallCorrect / TOTAL_QS) * 100);
+        
+        let rankText = "";
+        if (stats.overallCorrect === TOTAL_QS) rankText = "🏆 PERFECT GRAMMAR LEGEND 🏆";
+        else if (stats.overallCorrect >= 6) rankText = "🌟 English Pro 🌟";
+        else rankText = "📖 Keen Learner – Keep Growing!";
+        
+        document.getElementById('rank-slot').innerHTML = rankText;
+        document.getElementById('final-score').innerHTML = `🎯 Score: ${stats.overallCorrect} / ${TOTAL_QS}  (${scorePercent}%)`;
+        
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'block';
+        
+        const winAudio = document.getElementById('snd-win');
+        if (winAudio) winAudio.play().catch(e=>console.log);
+        canvasConfetti({ particleCount: 220, spread: 85, origin: { y: 0.6 }, colors: ['#0f766e', '#f59e0b', '#10b981'] });
+        canvasConfetti({ particleCount: 70, spread: 120, origin: { y: 0.4, x: 0.3 }, startVelocity: 15 });
+    }
+    
+    // Reset everything back to welcome screen
     function resetFullQuiz() {
         studentName = "";
         userAnswers = new Array(TOTAL_QS).fill(null);
@@ -460,9 +557,16 @@
         if (scoreLiveSpan) scoreLiveSpan.innerText = "0";
         if (answeredCountSpan) answeredCountSpan.innerText = "0";
         if (questionsContainer) questionsContainer.innerHTML = "";
+        
+        // Reset tab to "usedto"
+        currentTab = "usedto";
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === 'usedto') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
     }
     
-    // Certificate generation (PDF) for Grade 7
+    // Generate PDF certificate for Grade 7
     function downloadCertificate() {
         if (!studentName) {
             const fallback = document.getElementById('student-name')?.value.trim();
@@ -480,14 +584,12 @@
         const pageWidth = 297;
         const pageHeight = 210;
         
-        // background and border (Grade 7 style)
         doc.setFillColor(240, 248, 245);
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
         doc.setDrawColor(15, 118, 110);
         doc.setLineWidth(2.5);
         doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
         
-        // decorative elements
         doc.setFillColor(204, 251, 241, 0.3);
         doc.circle(45, 40, 22, 'F');
         doc.circle(255, 170, 28, 'F');
@@ -539,12 +641,13 @@
     
     // Expose global functions
     window.initiateQuiz = initiateQuiz;
+    window.switchTab = switchTab;
     window.resetFullQuiz = resetFullQuiz;
     window.downloadCertificate = downloadCertificate;
     
-    // initial stats render (ensures progress bar is zero)
+    // Initial stats render
     document.addEventListener('DOMContentLoaded', () => {
-        updateGlobalStats();
+        updateUIStats();
     });
 </script>
 </body>
