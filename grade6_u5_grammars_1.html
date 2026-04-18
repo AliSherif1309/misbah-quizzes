@@ -63,6 +63,51 @@
             object-fit: contain;
         }
 
+        /* TABS STYLE */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 60px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            background: transparent;
+            color: #475569;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #4f46e5;
+            box-shadow: 0 8px 20px rgba(79,70,229,0.15);
+        }
+        .tab-stats {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .tab-btn.active .tab-stats {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
         /* progress & stats */
         .progress-wrapper {
             background: #f1f5f9;
@@ -235,13 +280,6 @@
             font-weight: 500;
             margin-bottom: 1.5rem;
         }
-        .score-badge {
-            background: #eef2ff;
-            border-radius: 80px;
-            padding: 6px 20px;
-            font-weight: 700;
-            display: inline-block;
-        }
         footer {
             font-size: 0.7rem;
             text-align: center;
@@ -252,6 +290,8 @@
             .card { padding: 20px; }
             .option-btn { flex: 1 0 100%; }
             .progress-wrapper { flex-direction: column; align-items: stretch; }
+            .tabs-container { flex-direction: column; gap: 8px; }
+            .tab-btn { justify-content: space-between; }
         }
     </style>
 </head>
@@ -264,19 +304,31 @@
             <img src="lights-logo.png" class="logo" id="logo-lights" alt="logo" onerror="this.style.display='none'">
         </div>
         <h1>📚 Grade 6 Grammar Quiz</h1>
-        <div class="subhead">Articles & Question Tags • Mixed Challenge</div>
+        <div class="subhead">Articles & Question Tags • Tabbed Challenge</div>
         <p style="margin-bottom: 16px;">Teacher: Mr. Ali Misbah</p>
         <input type="text" id="student-name" placeholder="Enter your full name" autocomplete="off">
         <br>
         <button class="btn-main" onclick="initiateQuiz()">✨ Start Quiz ✨</button>
-        <footer>8 questions | instant feedback | certificate</footer>
+        <footer>8 questions across 2 tabs | instant feedback | certificate</footer>
     </div>
 
-    <!-- QUIZ SCREEN (unified, no tabs) -->
+    <!-- QUIZ SCREEN (with tabs) -->
     <div id="quiz-screen" class="card">
         <div class="logos-container" style="margin-bottom: 8px;">
             <div style="font-weight:800; background:#eef2ff; padding:5px 15px; border-radius:40px;">⭐ Grade 6 Challenge</div>
             <div style="font-size:0.8rem;">🎯 Mr. Ali Misbah</div>
+        </div>
+
+        <!-- TABS BAR -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="articles" onclick="switchTab('articles')">
+                📘 Articles
+                <span class="tab-stats" id="articles-stats">0/4 ✅ 0</span>
+            </button>
+            <button class="tab-btn" data-tab="tags" onclick="switchTab('tags')">
+                🔖 Question Tags
+                <span class="tab-stats" id="tags-stats">0/4 ✅ 0</span>
+            </button>
         </div>
         
         <div class="progress-wrapper">
@@ -284,12 +336,11 @@
                 <div class="progress-bar" id="p-bar"></div>
             </div>
             <div class="stats-text" id="live-stats">
-                📊 Score: <span id="score-live">0</span> / <span id="total-qty">8</span> &nbsp;| ✅ Answered: <span id="answered-count">0</span>/8
+                📊 Total Score: <span id="score-live">0</span> / <span id="total-qty">8</span> &nbsp;| ✅ Answered: <span id="answered-count">0</span>/8
             </div>
         </div>
 
         <div id="questions-container" class="questions-grid"></div>
-        <!-- No next tab button, unified quiz -->
     </div>
 
     <!-- RESULT SCREEN -->
@@ -312,22 +363,23 @@
 <script>
     const { jsPDF } = window.jspdf;
     
-    // ======================= NEW QUESTIONS SET (8 total) =======================
+    // ======================= QUESTIONS WITH CATEGORIES =======================
     const MASTER_QUESTIONS = [
-        { id: 0, text: "__________ teacher in our class is very kind.", options: ["an", "the", "☉", "a"], correct: 1 },
-        { id: 1, text: "She bought __________ new car yesterday.", options: ["the", "☉", "a", "an"], correct: 2 },
-        { id: 2, text: "We have a test on __________ Monday.", options: ["☉", "a", "an", "the"], correct: 0 },
-        { id: 3, text: "He found __________ interesting book at the library.", options: ["a", "the", "an", "☉"], correct: 2 },
-        { id: 4, text: "They play football every weekend, __________ ?", options: ["do they", "aren't they", "didn't they", "don't they"], correct: 3 },
-        { id: 5, text: "He works late on Mondays, __________ ?", options: ["isn't he", "doesn't he", "didn't he", "don't he"], correct: 1 },
-        { id: 6, text: "We need more time, __________ ?", options: ["do we", "did we", "aren't we", "don't we"], correct: 3 },
-        { id: 7, text: "She doesn't like spicy food, __________ ?", options: ["did she", "is she", "does she", "doesn't she"], correct: 2 }
+        { id: 0, text: "__________ teacher in our class is very kind.", options: ["an", "the", "☉", "a"], correct: 1, category: "articles" },
+        { id: 1, text: "She bought __________ new car yesterday.", options: ["the", "☉", "a", "an"], correct: 2, category: "articles" },
+        { id: 2, text: "We have a test on __________ Monday.", options: ["☉", "a", "an", "the"], correct: 0, category: "articles" },
+        { id: 3, text: "He found __________ interesting book at the library.", options: ["a", "the", "an", "☉"], correct: 2, category: "articles" },
+        { id: 4, text: "They play football every weekend, __________ ?", options: ["do they", "aren't they", "didn't they", "don't they"], correct: 3, category: "tags" },
+        { id: 5, text: "He works late on Mondays, __________ ?", options: ["isn't he", "doesn't he", "didn't he", "don't he"], correct: 1, category: "tags" },
+        { id: 6, text: "We need more time, __________ ?", options: ["do we", "did we", "aren't we", "don't we"], correct: 3, category: "tags" },
+        { id: 7, text: "She doesn't like spicy food, __________ ?", options: ["did she", "is she", "does she", "doesn't she"], correct: 2, category: "tags" }
     ];
     const TOTAL_QS = MASTER_QUESTIONS.length;
     
     // Global state
     let studentName = "";
-    let userAnswers = new Array(TOTAL_QS).fill(null);   // stores selected option index per question, null = unanswered
+    let userAnswers = new Array(TOTAL_QS).fill(null);
+    let currentTab = "articles";   // 'articles' or 'tags'
     
     // DOM elements
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -339,30 +391,55 @@
     const answeredCountSpan = document.getElementById('answered-count');
     const totalQtySpan = document.getElementById('total-qty');
     
-    // Helper: update stats (score, answered, progress bar)
-    function updateGlobalStats() {
-        let correctCount = 0;
-        let answered = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null) {
-                answered++;
-                if (userAnswers[i] === MASTER_QUESTIONS[i].correct) correctCount++;
-            }
-        }
-        // update UI
-        if (scoreLiveSpan) scoreLiveSpan.innerText = correctCount;
-        if (answeredCountSpan) answeredCountSpan.innerText = answered;
-        const percentComplete = (answered / TOTAL_QS) * 100;
-        progressBar.style.width = percentComplete + "%";
-        return { correctCount, answered };
-    }
-    
-    // render all questions dynamically with current answers
-    function renderAllQuestions() {
-        if (!questionsContainer) return;
-        questionsContainer.innerHTML = "";
+    // Helper: compute stats per category and overall
+    function computeStats() {
+        let articlesDone = 0, articlesCorrect = 0;
+        let tagsDone = 0, tagsCorrect = 0;
+        let overallCorrect = 0, overallDone = 0;
         
         MASTER_QUESTIONS.forEach(q => {
+            const ans = userAnswers[q.id];
+            const isAnswered = ans !== null;
+            if (isAnswered) {
+                overallDone++;
+                const isRight = (ans === q.correct);
+                if (isRight) overallCorrect++;
+                
+                if (q.category === "articles") {
+                    articlesDone++;
+                    if (isRight) articlesCorrect++;
+                } else {
+                    tagsDone++;
+                    if (isRight) tagsCorrect++;
+                }
+            }
+        });
+        
+        return { articlesDone, articlesCorrect, tagsDone, tagsCorrect, overallCorrect, overallDone };
+    }
+    
+    function updateUIStats() {
+        const stats = computeStats();
+        // Update tab badges
+        document.getElementById('articles-stats').innerHTML = `${stats.articlesDone}/4 ✅ ${stats.articlesCorrect}`;
+        document.getElementById('tags-stats').innerHTML = `${stats.tagsDone}/4 ✅ ${stats.tagsCorrect}`;
+        
+        // Update overall progress
+        if (scoreLiveSpan) scoreLiveSpan.innerText = stats.overallCorrect;
+        if (answeredCountSpan) answeredCountSpan.innerText = stats.overallDone;
+        const percentComplete = (stats.overallDone / TOTAL_QS) * 100;
+        progressBar.style.width = percentComplete + "%";
+        
+        return stats;
+    }
+    
+    // Render questions for current tab only
+    function renderCurrentTab() {
+        if (!questionsContainer) return;
+        const filtered = MASTER_QUESTIONS.filter(q => q.category === currentTab);
+        questionsContainer.innerHTML = "";
+        
+        filtered.forEach(q => {
             const card = document.createElement('div');
             card.className = 'question-card';
             const questionDiv = document.createElement('div');
@@ -376,12 +453,10 @@
             q.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = `${String.fromCharCode(97+idx)}) ${opt}`;  // a), b), c) style
-                // disable if already answered
+                btn.innerText = `${String.fromCharCode(97+idx)}) ${opt}`;
                 const isAnswered = userAnswers[q.id] !== null;
                 if (isAnswered) {
                     btn.disabled = true;
-                    // highlight correct answer and user's wrong selection
                     if (idx === q.correct) btn.classList.add('correct');
                     if (idx === userAnswers[q.id] && idx !== q.correct) btn.classList.add('wrong');
                 } else {
@@ -394,59 +469,38 @@
         });
     }
     
-    // handle user selecting an option
+    // Handle answer selection
     function handleAnswer(questionId, selectedIdx) {
-        // prevent double answers
         if (userAnswers[questionId] !== null) return;
         
         const isCorrect = (selectedIdx === MASTER_QUESTIONS[questionId].correct);
-        // play sound
         const sound = document.getElementById(isCorrect ? 'snd-correct' : 'snd-wrong');
         if (sound) sound.play().catch(e => console.log("audio blocked"));
         
-        // store answer
         userAnswers[questionId] = selectedIdx;
         
-        // re-render to show correct/wrong feedback and disable options
-        renderAllQuestions();
+        // Re-render current tab to show feedback
+        renderCurrentTab();
+        const stats = updateUIStats();
         
-        // update stats and progress
-        const { answered, correctCount } = updateGlobalStats();
-        
-        // if all questions answered, show results after a short delay (celebration)
-        if (answered === TOTAL_QS) {
-            setTimeout(() => {
-                showFinalResults();
-            }, 400);
+        // If all questions answered, show results
+        if (stats.overallDone === TOTAL_QS) {
+            setTimeout(() => showFinalResults(), 400);
         }
     }
     
-    // Final results & confetti
-    function showFinalResults() {
-        let correctCount = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null && userAnswers[i] === MASTER_QUESTIONS[i].correct) correctCount++;
-        }
-        const scorePercent = Math.round((correctCount / TOTAL_QS) * 100);
-        
-        // set rank text based on score
-        let rankText = "";
-        if (correctCount === TOTAL_QS) rankText = "🏆 PERFECT GRAMMAR LEGEND 🏆";
-        else if (correctCount >= 6) rankText = "🌟 English Pro 🌟";
-        else rankText = "📖 Keen Learner – Keep Growing!";
-        
-        document.getElementById('rank-slot').innerHTML = rankText;
-        document.getElementById('final-score').innerHTML = `🎯 Score: ${correctCount} / ${TOTAL_QS}  (${scorePercent}%)`;
-        
-        // switch screens
-        quizScreen.style.display = 'none';
-        resultScreen.style.display = 'block';
-        
-        // play win sound + confetti
-        const winAudio = document.getElementById('snd-win');
-        if (winAudio) winAudio.play().catch(e=>console.log);
-        canvasConfetti({ particleCount: 220, spread: 85, origin: { y: 0.6 }, colors: ['#4f46e5', '#f59e0b', '#10b981'] });
-        canvasConfetti({ particleCount: 70, spread: 120, origin: { y: 0.4, x: 0.3 }, startVelocity: 15 });
+    // Switch between tabs
+    function switchTab(tab) {
+        currentTab = tab;
+        // Update active class on buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === tab) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        renderCurrentTab();
     }
     
     // Initialize quiz from welcome screen
@@ -458,49 +512,69 @@
             return;
         }
         studentName = rawName;
-        // reset answers array
         userAnswers = new Array(TOTAL_QS).fill(null);
         
-        // reset UI and render fresh
-        updateGlobalStats(); // resets progress bar and counters
-        renderAllQuestions();
+        // Reset UI
+        updateUIStats();
+        renderCurrentTab();
         
-        // switch screens
         welcomeScreen.style.display = 'none';
         quizScreen.style.display = 'block';
         resultScreen.style.display = 'none';
         
-        // scroll to top
         if (questionsContainer) questionsContainer.scrollTop = 0;
     }
     
-    // Reset everything (back to welcome)
+    // Show final results with confetti
+    function showFinalResults() {
+        const stats = computeStats();
+        const scorePercent = Math.round((stats.overallCorrect / TOTAL_QS) * 100);
+        
+        let rankText = "";
+        if (stats.overallCorrect === TOTAL_QS) rankText = "🏆 PERFECT GRAMMAR LEGEND 🏆";
+        else if (stats.overallCorrect >= 6) rankText = "🌟 English Pro 🌟";
+        else rankText = "📖 Keen Learner – Keep Growing!";
+        
+        document.getElementById('rank-slot').innerHTML = rankText;
+        document.getElementById('final-score').innerHTML = `🎯 Score: ${stats.overallCorrect} / ${TOTAL_QS}  (${scorePercent}%)`;
+        
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'block';
+        
+        const winAudio = document.getElementById('snd-win');
+        if (winAudio) winAudio.play().catch(e=>console.log);
+        canvasConfetti({ particleCount: 220, spread: 85, origin: { y: 0.6 }, colors: ['#4f46e5', '#f59e0b', '#10b981'] });
+        canvasConfetti({ particleCount: 70, spread: 120, origin: { y: 0.4, x: 0.3 }, startVelocity: 15 });
+    }
+    
+    // Reset everything back to welcome screen
     function resetFullQuiz() {
         studentName = "";
         userAnswers = new Array(TOTAL_QS).fill(null);
         
-        // clear name field
         const nameField = document.getElementById('student-name');
         if (nameField) nameField.value = "";
         
-        // reset UI visibility
         welcomeScreen.style.display = 'block';
         quizScreen.style.display = 'none';
         resultScreen.style.display = 'none';
         
-        // clear progress stats visually for next attempt
         if (progressBar) progressBar.style.width = "0%";
         if (scoreLiveSpan) scoreLiveSpan.innerText = "0";
         if (answeredCountSpan) answeredCountSpan.innerText = "0";
-        
-        // optional: reset container to empty to avoid flickering
         if (questionsContainer) questionsContainer.innerHTML = "";
+        
+        // Reset tab to articles
+        currentTab = "articles";
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-tab') === 'articles') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
     }
     
-    // Certificate generation (PDF) using new questions total
+    // Generate PDF certificate
     function downloadCertificate() {
         if (!studentName) {
-            // fallback: get from input if somehow missing
             const fallback = document.getElementById('student-name')?.value.trim();
             if (fallback) studentName = fallback;
             else studentName = "Talented Student";
@@ -516,7 +590,6 @@
         const pageWidth = 297;
         const pageHeight = 210;
         
-        // background / border styling
         doc.setDrawColor(79, 70, 229);
         doc.setFillColor(253, 242, 248);
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -524,12 +597,10 @@
         doc.setLineWidth(2.5);
         doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
         
-        // add decorative circles
         doc.setFillColor(199, 210, 254, 0.3);
         doc.circle(40, 40, 20, 'F');
         doc.circle(260, 170, 25, 'F');
         
-        // title
         doc.setFont("helvetica", "bold");
         doc.setFontSize(32);
         doc.setTextColor(30, 41, 59);
@@ -575,15 +646,15 @@
     // Set total questions label once
     if (totalQtySpan) totalQtySpan.innerText = TOTAL_QS;
     
-    // Optional: prevent event listener collisions, expose functions globally
+    // Expose global functions
     window.initiateQuiz = initiateQuiz;
+    window.switchTab = switchTab;
     window.resetFullQuiz = resetFullQuiz;
     window.downloadCertificate = downloadCertificate;
     
-    // initial dummy render to avoid reference errors (nothing shown yet)
+    // Initial stats render
     document.addEventListener('DOMContentLoaded', () => {
-        // preload audio hint (optional)
-        updateGlobalStats();
+        updateUIStats();
     });
 </script>
 </body>
