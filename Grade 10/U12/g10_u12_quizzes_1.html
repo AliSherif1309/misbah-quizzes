@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Grade 10 Master Quiz | Grammar & Vocabulary</title>
+    <title>Grade 10 Master Quiz | Grammar & Vocabulary (3 Sets)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -29,7 +29,7 @@
 
         .container {
             width: 100%;
-            max-width: 960px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -64,7 +64,7 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
         .main-tab-btn {
             flex: 1;
@@ -88,14 +88,57 @@
             color: #1e40af;
             box-shadow: 0 8px 20px rgba(30,64,175,0.15);
         }
-        .tab-stats {
+        .main-stats {
             background: #e2e8f0;
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.75rem;
             font-weight: 700;
         }
-        .main-tab-btn.active .tab-stats {
+        .main-tab-btn.active .main-stats {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        /* SECONDARY TABS (for Vocabulary sets) */
+        .sub-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 60px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .sub-tab-btn {
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            background: transparent;
+            color: #334155;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sub-tab-btn.active {
+            background: white;
+            color: #1e40af;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .sub-stats {
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .sub-tab-btn.active .sub-stats {
             background: #dbeafe;
             color: #1e3a8a;
         }
@@ -269,11 +312,12 @@
             margin-top: 1rem;
             color: #64748b;
         }
-        @media (max-width: 680px) {
+        @media (max-width: 720px) {
             .card { padding: 20px; }
             .option-btn { flex: 1 0 100%; }
             .main-tabs { flex-direction: column; gap: 10px; }
-            .main-tab-btn { justify-content: space-between; }
+            .sub-tabs { flex-direction: column; align-items: stretch; }
+            .sub-tab-btn { justify-content: center; }
         }
     </style>
 </head>
@@ -285,34 +329,37 @@
             <img src="neu-logo.png" class="logo" id="logo-neu" alt="logo" onerror="this.style.display='none'">
             <img src="lights-logo.png" class="logo" id="logo-lights" alt="logo" onerror="this.style.display='none'">
         </div>
-        <h1>📘 Grade 10 Quiz</h1>
-        <div class="subhead">Unit 12: Grammar & Vocabulary</div>
+        <h1>📘 Grade 10 High Achiever Quiz</h1>
+        <div class="subhead">Unit 12: Grammar & Vocabulary (3 Sets)</div>
         <p style="margin-bottom: 16px;">Teacher: Mr. Ali Misbah</p>
         <input type="text" id="student-name" placeholder="Enter your full name" autocomplete="off">
         <br>
         <button class="btn-main" onclick="initiateQuiz()">✨ Start Quiz ✨</button>
-        <footer>28 questions (Grammar + Vocabulary) | certificate included</footer>
+        <footer>28 questions (Grammar + 3 Vocabulary Sets) | certificate included</footer>
     </div>
 
-    <!-- QUIZ SCREEN (with main tabs) -->
+    <!-- QUIZ SCREEN (main + sub tabs) -->
     <div id="quiz-screen" class="card">
         <div class="logos-container" style="margin-bottom: 8px;">
             <div style="font-weight:800; background:#eef2ff; padding:5px 15px; border-radius:40px;">🎓 Grade 10 Challenge</div>
             <div style="font-size:0.8rem;">🎯 Mr. Ali Misbah</div>
         </div>
 
-        <!-- Main Tabs: Grammar / Vocabulary -->
+        <!-- Main Tabs -->
         <div class="main-tabs">
             <button class="main-tab-btn active" data-main="grammar" onclick="switchMainTab('grammar')">
                 📖 Grammar
-                <span class="tab-stats" id="grammar-stats">0/9 ✅ 0</span>
+                <span class="main-stats" id="grammar-main-stats">0/9 ✅ 0</span>
             </button>
             <button class="main-tab-btn" data-main="vocab" onclick="switchMainTab('vocab')">
                 📚 Vocabulary
-                <span class="tab-stats" id="vocab-stats">0/19 ✅ 0</span>
+                <span class="main-stats" id="vocab-main-stats">0/19 ✅ 0</span>
             </button>
         </div>
-        
+
+        <!-- Secondary tabs (only visible for Vocabulary) -->
+        <div id="sub-tabs-container" class="sub-tabs" style="display: none;"></div>
+
         <div class="progress-wrapper">
             <div class="progress-container">
                 <div class="progress-bar" id="global-progress"></div>
@@ -343,51 +390,57 @@
     const { jsPDF } = window.jspdf;
     
     // ======================= GRADE 10 QUESTIONS =======================
-    // GRAMMAR (9 questions)
+    // GRAMMAR (9 questions from previous)
     const GRAMMAR_QS = [
-        { id: 0, text: "1. If he ................ slowly, the accident wouldn't have happened.", options: ["Drives", "drove", "had given", "will drive"], correct: 2, main: "grammar" },
-        { id: 1, text: "2. We ................ by taxi if we had found the right bus.", options: ["came", "won't come", "wouldn't have come", "would come"], correct: 2, main: "grammar" },
-        { id: 2, text: "3. The man ................ sent you this letter is my cousin.", options: ["who", "whose", "where", "which"], correct: 0, main: "grammar" },
-        { id: 3, text: "4. This is the house ................ Omar lives.", options: ["whose", "where", "who", "which"], correct: 1, main: "grammar" },
-        { id: 4, text: "5. The man ................ the car hit him yesterday, was hospitalised immediately.", options: ["whose", "which", "whom", "when"], correct: 2, main: "grammar" },
-        { id: 5, text: "6. If she ................ the map, she wouldn't have gotten lost.", options: ["uses", "used", "had used", "will use"], correct: 2, main: "grammar" },
-        { id: 6, text: "7. They ................ the match if the referee hadn't made that mistake.", options: ["win", "won", "would have won", "would win"], correct: 2, main: "grammar" },
-        { id: 7, text: "8. I met the famous writer ................ stories are well-known worldwide.", options: ["who", "whom", "where", "whose"], correct: 3, main: "grammar" },
-        { id: 8, text: "9. If I had to borrow some money, I ................ my elder brother.", options: ["will ask", "would have asked", "would ask", "am asking"], correct: 2, main: "grammar" }
+        { id: 0, text: "1. If he ................ slowly, the accident wouldn't have happened.", options: ["Drives", "drove", "had driven", "will drive"], correct: 2, main: "grammar", sub: null },
+        { id: 1, text: "2. We ................ by taxi if we had found the right bus.", options: ["came", "won't come", "wouldn't have come", "would come"], correct: 2, main: "grammar", sub: null },
+        { id: 2, text: "3. The man ................ sent you this letter is my cousin.", options: ["who", "whose", "where", "which"], correct: 0, main: "grammar", sub: null },
+        { id: 3, text: "4. This is the house ................ Omar lives.", options: ["whose", "where", "who", "which"], correct: 1, main: "grammar", sub: null },
+        { id: 4, text: "5. The man ................ the car hit him yesterday, was hospitalised immediately.", options: ["whose", "which", "whom", "when"], correct: 2, main: "grammar", sub: null },
+        { id: 5, text: "6. If she ................ the map, she wouldn't have gotten lost.", options: ["uses", "used", "had used", "will use"], correct: 2, main: "grammar", sub: null },
+        { id: 6, text: "7. They ................ the match if the referee hadn't made that mistake.", options: ["win", "won", "would have won", "would win"], correct: 2, main: "grammar", sub: null },
+        { id: 7, text: "8. I met the famous writer ................ stories are well-known worldwide.", options: ["who", "whom", "where", "whose"], correct: 3, main: "grammar", sub: null },
+        { id: 8, text: "9. If I had to borrow some money, I ................ my elder brother.", options: ["will ask", "would have asked", "would ask", "am asking"], correct: 2, main: "grammar", sub: null }
     ];
     
-    // VOCABULARY (19 questions combined from 3 sets)
-    const VOCAB_QS = [
-        // Set 1 (8)
-        { id: 9, text: "1. Modern ................ has made the world smaller by bringing people and cultures closer.", options: ["aviation", "gliding", "instructors", "ring"], correct: 0, main: "vocab" },
-        { id: 10, text: "2. ................ is an exciting sport that lets you fly without an engine.", options: ["aviation", "instructor", "ring", "gliding"], correct: 3, main: "vocab" },
-        { id: 11, text: "3. My sister focused ................ on her studies to prepare for the exam.", options: ["Exemplary", "intensely", "briefly", "crazily"], correct: 1, main: "vocab" },
-        { id: 12, text: "4. Schools reward students who show ................ behaviour during the school year.", options: ["exemplary", "portable", "urgent", "impromptu"], correct: 0, main: "vocab" },
-        { id: 13, text: "5. Children should be taught to behave ................ and kindly towards other people.", options: ["courteously", "notably", "intensely", "briefly"], correct: 0, main: "vocab" },
-        { id: 14, text: "6. The teacher spoke in a ................ voice to stop the noise.", options: ["stunned", "stern", "exemplary", "confrontational"], correct: 1, main: "vocab" },
-        { id: 15, text: "7. My friend closely ................ her mother in both looks and personality.", options: ["coincides with", "unlocks", "mumbles", "resembles"], correct: 3, main: "vocab" },
-        { id: 16, text: "8. The seats of the plane were comfortable, and the flight ................ were friendly and helpful.", options: ["attendants", "expressions", "instructors", "cabins"], correct: 0, main: "vocab" },
-        // Set 2 (6)
-        { id: 17, text: "9. The plane usually flies at an ................ of more than 16 thousand feet.", options: ["radar", "headline", "altitude", "fog"], correct: 2, main: "vocab" },
-        { id: 18, text: "10. My family ordered a/an ................ table for the dining room.", options: ["custom-built", "voice-activated", "stern", "stunned"], correct: 0, main: "vocab" },
-        { id: 19, text: "11. Learning how to ................ is an important aspect of pilot training.", options: ["mumble", "endeavour", "aviate", "resemble"], correct: 2, main: "vocab" },
-        { id: 20, text: "12. The ................ of the news grabbed my attention with an interesting story.", options: ["velocity", "control", "eyewitness", "headline"], correct: 3, main: "vocab" },
-        { id: 21, text: "13. You should ................ an expert before starting your own business.", options: ["smuggle", "consult", "recharge", "slide"], correct: 1, main: "vocab" },
-        { id: 22, text: "14. All the passengers cheered loudly when the plane ................", options: ["set off", "touched down", "knocked off", "dropped off"], correct: 1, main: "vocab" },
-        // Set 3 (5)
-        { id: 23, text: "15. The club celebrated its 21st ................ with a special event for its fans and players.", options: ["frequency", "current", "anniversary", "congestion"], correct: 2, main: "vocab" },
-        { id: 24, text: "16. Safety measures should be taken in the science lab to avoid ................ situations.", options: ["acclaimed", "affluent", "portable", "hazardous"], correct: 3, main: "vocab" },
-        { id: 25, text: "17. It is a smart move towards a better future to ................ in renewable energy companies.", options: ["slide", "invest", "mumble", "draw"], correct: 1, main: "vocab" },
-        { id: 26, text: "18. Unluckily, a boy was ................ his bike by a careless driver as he was crossing the road.", options: ["knocked off", "turned up", "set off", "ended up with"], correct: 0, main: "vocab" },
-        { id: 27, text: "19. The flight ................ provided excellent service to the passengers throughout the journey.", options: ["auction", "breakdown", "hassle", "attendant"], correct: 3, main: "vocab" }
+    // VOCABULARY: Set 1 (first 8 questions from original vocab list)
+    const VOCAB_SET1 = [
+        { id: 9, text: "1. Modern ................ has made the world smaller by bringing people and cultures closer.", options: ["aviation", "gliding", "instructors", "ring"], correct: 0, main: "vocab", sub: "set1" },
+        { id: 10, text: "2. ................ is an exciting sport that lets you fly without an engine.", options: ["aviation", "instructor", "ring", "gliding"], correct: 3, main: "vocab", sub: "set1" },
+        { id: 11, text: "3. My sister focused ................ on her studies to prepare for the exam.", options: ["Exemplary", "intensely", "briefly", "crazily"], correct: 1, main: "vocab", sub: "set1" },
+        { id: 12, text: "4. Schools reward students who show ................ behaviour during the school year.", options: ["exemplary", "portable", "urgent", "impromptu"], correct: 0, main: "vocab", sub: "set1" },
+        { id: 13, text: "5. Children should be taught to behave ................ and kindly towards other people.", options: ["courteously", "notably", "intensely", "briefly"], correct: 0, main: "vocab", sub: "set1" },
+        { id: 14, text: "6. The teacher spoke in a ................ voice to stop the noise.", options: ["stunned", "stern", "exemplary", "confrontational"], correct: 1, main: "vocab", sub: "set1" },
+        { id: 15, text: "7. My friend closely ................ her mother in both looks and personality.", options: ["coincides with", "unlocks", "mumbles", "resembles"], correct: 3, main: "vocab", sub: "set1" },
+        { id: 16, text: "8. The seats of the plane were comfortable, and the flight ................ were friendly and helpful.", options: ["attendants", "expressions", "instructors", "cabins"], correct: 0, main: "vocab", sub: "set1" }
     ];
     
-    const ALL_QUESTIONS = [...GRAMMAR_QS, ...VOCAB_QS];
+    // VOCABULARY: Set 2 (next 6 questions)
+    const VOCAB_SET2 = [
+        { id: 17, text: "1. The plane usually flies at an ................ of more than 16 thousand feet.", options: ["radar", "headline", "altitude", "fog"], correct: 2, main: "vocab", sub: "set2" },
+        { id: 18, text: "2. My family ordered a/an ................ table for the dining room.", options: ["custom-built", "voice-activated", "stern", "stunned"], correct: 0, main: "vocab", sub: "set2" },
+        { id: 19, text: "3. Learning how to ................ is an important aspect of pilot training.", options: ["mumble", "endeavour", "aviate", "resemble"], correct: 2, main: "vocab", sub: "set2" },
+        { id: 20, text: "4. The ................ of the news grabbed my attention with an interesting story.", options: ["velocity", "control", "eyewitness", "headline"], correct: 3, main: "vocab", sub: "set2" },
+        { id: 21, text: "5. You should ................ an expert before starting your own business.", options: ["smuggle", "consult", "recharge", "slide"], correct: 1, main: "vocab", sub: "set2" },
+        { id: 22, text: "6. All the passengers cheered loudly when the plane ................", options: ["set off", "touched down", "knocked off", "dropped off"], correct: 1, main: "vocab", sub: "set2" }
+    ];
+    
+    // VOCABULARY: Set 3 (last 5 questions)
+    const VOCAB_SET3 = [
+        { id: 23, text: "1. The club celebrated its 21st ................ with a special event for its fans and players.", options: ["frequency", "current", "anniversary", "congestion"], correct: 2, main: "vocab", sub: "set3" },
+        { id: 24, text: "2. Safety measures should be taken in the science lab to avoid ................ situations.", options: ["acclaimed", "affluent", "portable", "hazardous"], correct: 3, main: "vocab", sub: "set3" },
+        { id: 25, text: "3. It is a smart move towards a better future to ................ in renewable energy companies.", options: ["slide", "invest", "mumble", "draw"], correct: 1, main: "vocab", sub: "set3" },
+        { id: 26, text: "4. Unluckily, a boy was ................ his bike by a careless driver as he was crossing the road.", options: ["knocked off", "turned up", "set off", "ended up with"], correct: 0, main: "vocab", sub: "set3" },
+        { id: 27, text: "5. The flight ................ provided excellent service to the passengers throughout the journey.", options: ["auction", "breakdown", "hassle", "attendant"], correct: 3, main: "vocab", sub: "set3" }
+    ];
+    
+    const ALL_QUESTIONS = [...GRAMMAR_QS, ...VOCAB_SET1, ...VOCAB_SET2, ...VOCAB_SET3];
     const TOTAL_QS = ALL_QUESTIONS.length;
     
     let studentName = "";
     let userAnswers = new Array(TOTAL_QS).fill(null);
-    let currentMain = "grammar";   // 'grammar' or 'vocab'
+    let currentMain = "grammar";      // 'grammar' or 'vocab'
+    let currentSub = null;             // for vocab: 'set1', 'set2', 'set3'
     
     // DOM elements
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -397,12 +450,14 @@
     const globalProgress = document.getElementById('global-progress');
     const totalScoreSpan = document.getElementById('total-score-span');
     const totalQtySpan = document.getElementById('total-questions-count');
+    const subTabsContainer = document.getElementById('sub-tabs-container');
     
-    // Helper: compute stats per main category and overall
+    // Helper: compute stats per main and per sub
     function computeStats() {
         let grammarDone = 0, grammarCorrect = 0;
         let vocabDone = 0, vocabCorrect = 0;
         let overallCorrect = 0, overallDone = 0;
+        let subStats = { set1: { done: 0, correct: 0, total: 8 }, set2: { done: 0, correct: 0, total: 6 }, set3: { done: 0, correct: 0, total: 5 } };
         
         ALL_QUESTIONS.forEach(q => {
             const ans = userAnswers[q.id];
@@ -418,53 +473,102 @@
                 } else {
                     vocabDone++;
                     if (isRight) vocabCorrect++;
+                    if (q.sub === "set1") {
+                        subStats.set1.done++;
+                        if (isRight) subStats.set1.correct++;
+                    } else if (q.sub === "set2") {
+                        subStats.set2.done++;
+                        if (isRight) subStats.set2.correct++;
+                    } else if (q.sub === "set3") {
+                        subStats.set3.done++;
+                        if (isRight) subStats.set3.correct++;
+                    }
                 }
             }
         });
-        return { grammarDone, grammarCorrect, vocabDone, vocabCorrect, overallCorrect, overallDone };
+        return { grammarDone, grammarCorrect, vocabDone, vocabCorrect, overallCorrect, overallDone, subStats };
     }
     
     function updateUIStats() {
         const stats = computeStats();
-        document.getElementById('grammar-stats').innerHTML = `${stats.grammarDone}/9 ✅ ${stats.grammarCorrect}`;
-        document.getElementById('vocab-stats').innerHTML = `${stats.vocabDone}/19 ✅ ${stats.vocabCorrect}`;
+        document.getElementById('grammar-main-stats').innerHTML = `${stats.grammarDone}/9 ✅ ${stats.grammarCorrect}`;
+        document.getElementById('vocab-main-stats').innerHTML = `${stats.vocabDone}/19 ✅ ${stats.vocabCorrect}`;
         totalScoreSpan.innerText = stats.overallCorrect;
         const percent = (stats.overallDone / TOTAL_QS) * 100;
         globalProgress.style.width = percent + "%";
+        
+        // update sub-tab badges if they exist
+        const set1btn = document.getElementById('sub-set1');
+        if (set1btn) set1btn.querySelector('.sub-stats').innerHTML = `${stats.subStats.set1.done}/8 ✅ ${stats.subStats.set1.correct}`;
+        const set2btn = document.getElementById('sub-set2');
+        if (set2btn) set2btn.querySelector('.sub-stats').innerHTML = `${stats.subStats.set2.done}/6 ✅ ${stats.subStats.set2.correct}`;
+        const set3btn = document.getElementById('sub-set3');
+        if (set3btn) set3btn.querySelector('.sub-stats').innerHTML = `${stats.subStats.set3.done}/5 ✅ ${stats.subStats.set3.correct}`;
         return stats;
     }
     
-    // Render current main tab questions
+    // Build sub-tabs for Vocabulary (3 sets)
+    function rebuildSubTabs() {
+        if (currentMain === 'grammar') {
+            subTabsContainer.style.display = 'none';
+            currentSub = null;
+        } else {
+            subTabsContainer.style.display = 'flex';
+            subTabsContainer.innerHTML = `
+                <button id="sub-set1" class="sub-tab-btn ${currentSub === 'set1' ? 'active' : ''}" onclick="switchSubTab('set1')">
+                    📘 Lessons 1&2 (8) <span class="sub-stats">0/8 ✅ 0</span>
+                </button>
+                <button id="sub-set2" class="sub-tab-btn ${currentSub === 'set2' ? 'active' : ''}" onclick="switchSubTab('set2')">
+                    📗 Lessons 4&5 (6) <span class="sub-stats">0/6 ✅ 0</span>
+                </button>
+                <button id="sub-set3" class="sub-tab-btn ${currentSub === 'set3' ? 'active' : ''}" onclick="switchSubTab('set3')">
+                    📙 Lessons 7&8 <span class="sub-stats">0/5 ✅ 0</span>
+                </button>
+            `;
+            if (!currentSub) currentSub = 'set1';
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+                if (btn.id === `sub-${currentSub}`) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+        updateUIStats();
+    }
+    
+    function getCurrentQuestions() {
+        if (currentMain === 'grammar') {
+            return ALL_QUESTIONS.filter(q => q.main === 'grammar');
+        } else {
+            return ALL_QUESTIONS.filter(q => q.main === 'vocab' && q.sub === currentSub);
+        }
+    }
+    
     function renderCurrentTab() {
         if (!questionsContainer) return;
-        const filtered = ALL_QUESTIONS.filter(q => q.main === currentMain);
+        const filtered = getCurrentQuestions();
         questionsContainer.innerHTML = "";
         
-        filtered.forEach(q => {
+        filtered.forEach((q, idx) => {
             const card = document.createElement('div');
             card.className = 'question-card';
             const qText = document.createElement('div');
             qText.className = 'question-text';
-            // Show original numbering (1-9 for grammar, 1-19 for vocab) - but keep id display clean
-            let displayNum = q.id + 1;
-            if (currentMain === 'grammar') displayNum = q.id - 0 + 1;
-            else displayNum = q.id - 8;  // vocab starts at id 9 -> display 1
+            let displayNum = idx + 1;
             qText.innerText = `${displayNum}. ${q.text}`;
             card.appendChild(qText);
             
             const optsDiv = document.createElement('div');
             optsDiv.className = 'options-area';
-            q.options.forEach((opt, idx) => {
+            q.options.forEach((opt, optIdx) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = `${String.fromCharCode(65+idx)}. ${opt}`;
+                btn.innerText = `${String.fromCharCode(65+optIdx)}. ${opt}`;
                 const isAnswered = userAnswers[q.id] !== null;
                 if (isAnswered) {
                     btn.disabled = true;
-                    if (idx === q.correct) btn.classList.add('correct');
-                    if (idx === userAnswers[q.id] && idx !== q.correct) btn.classList.add('wrong');
+                    if (optIdx === q.correct) btn.classList.add('correct');
+                    if (optIdx === userAnswers[q.id] && optIdx !== q.correct) btn.classList.add('wrong');
                 } else {
-                    btn.onclick = () => handleAnswer(q.id, idx);
+                    btn.onclick = () => handleAnswer(q.id, optIdx);
                 }
                 optsDiv.appendChild(btn);
             });
@@ -489,10 +593,22 @@
     
     function switchMainTab(main) {
         currentMain = main;
+        if (main === 'grammar') {
+            currentSub = null;
+        } else {
+            if (!currentSub) currentSub = 'set1';
+        }
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
             if (btn.getAttribute('data-main') === main) btn.classList.add('active');
             else btn.classList.remove('active');
         });
+        rebuildSubTabs();
+        renderCurrentTab();
+    }
+    
+    function switchSubTab(sub) {
+        currentSub = sub;
+        rebuildSubTabs();
         renderCurrentTab();
     }
     
@@ -506,10 +622,12 @@
         studentName = raw;
         userAnswers = new Array(TOTAL_QS).fill(null);
         currentMain = "grammar";
+        currentSub = null;
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
             if (btn.getAttribute('data-main') === 'grammar') btn.classList.add('active');
             else btn.classList.remove('active');
         });
+        rebuildSubTabs();
         updateUIStats();
         renderCurrentTab();
         welcomeScreen.style.display = 'none';
@@ -522,7 +640,7 @@
         const stats = computeStats();
         const percent = Math.round((stats.overallCorrect / TOTAL_QS) * 100);
         let rank = "";
-        if (stats.overallCorrect === TOTAL_QS) rank = "🏅 PERFECT SCHOLAR 🏅";
+        if (stats.overallCorrect === TOTAL_QS) rank = "🏆 PERFECT SCHOLAR 🏆";
         else if (stats.overallCorrect >= 23) rank = "🌟 Excellence Award 🌟";
         else if (stats.overallCorrect >= 18) rank = "📚 Proficient Achiever";
         else rank = "📖 Keep Growing!";
@@ -543,9 +661,10 @@
         welcomeScreen.style.display = 'block';
         quizScreen.style.display = 'none';
         resultScreen.style.display = 'none';
+        currentMain = "grammar";
+        currentSub = null;
         updateUIStats();
         globalProgress.style.width = "0%";
-        currentMain = "grammar";
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
             if (btn.getAttribute('data-main') === 'grammar') btn.classList.add('active');
             else btn.classList.remove('active');
@@ -587,7 +706,7 @@
         doc.setFontSize(16);
         doc.setTextColor(51, 65, 85);
         doc.text(`for outstanding performance in Grade 10 English (Unit 12)`, w/2, 138, { align: "center" });
-        doc.text(`Grammar & Vocabulary Mastery`, w/2, 152, { align: "center" });
+        doc.text(`Grammar & Vocabulary Mastery (3 Sets)`, w/2, 152, { align: "center" });
         
         doc.setFontSize(20);
         doc.setFont("helvetica", "bold");
@@ -612,6 +731,7 @@
     totalQtySpan.innerText = TOTAL_QS;
     window.initiateQuiz = initiateQuiz;
     window.switchMainTab = switchMainTab;
+    window.switchSubTab = switchSubTab;
     window.resetFullQuiz = resetFullQuiz;
     window.downloadCertificate = downloadCertificate;
     
