@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Grade 9 Reading Comprehension | How We Read Newspapers – Timed Quiz</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #fef2f2 0%, #fce7f3 100%);
+            margin: 0;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+            padding: 28px 32px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        #quiz-screen, #result-screen {
+            display: none;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            height: 58px;
+            object-fit: contain;
+        }
+
+        .passage-box {
+            background: #fff1f2;
+            border-left: 6px solid #ec4899;
+            padding: 20px 24px;
+            border-radius: 28px;
+            margin-bottom: 28px;
+            max-height: 280px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: #1e293b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .passage-box p {
+            margin-bottom: 12px;
+        }
+        .passage-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .timer-submit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px;
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 60px;
+            flex-wrap: wrap;
+        }
+        .timer-box {
+            background: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            font-family: monospace;
+            color: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .timer-box span {
+            color: #ef4444;
+        }
+        .submit-btn {
+            background: linear-gradient(105deg, #10b981, #059669);
+            border: none;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            transition: 0.2s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+        }
+
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 6px 4px 12px 4px;
+            scroll-behavior: smooth;
+        }
+        .question-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 20px 24px;
+            border: 1px solid #fbcfe8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .question-text {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 18px;
+            line-height: 1.4;
+            padding-left: 14px;
+            border-left: 5px solid #ec4899;
+            color: #0f172a;
+        }
+        .options-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .radio-option {
+            flex: 1 0 calc(50% - 12px);
+            min-width: 170px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 40px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .radio-option:hover {
+            background: #ffe4e6;
+            border-color: #fbcfe8;
+            transform: scale(0.98);
+        }
+        .radio-option input {
+            margin-right: 12px;
+            accent-color: #ec4899;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .radio-option label {
+            font-family: 'Inter', monospace;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1e293b;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .btn-main {
+            background: linear-gradient(105deg, #ec4899, #db2777);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 6px 14px rgba(236,72,153,0.3);
+        }
+        .btn-main:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+        }
+        .btn-secondary {
+            background: #334155;
+            box-shadow: none;
+        }
+        input[type="text"] {
+            width: 85%;
+            padding: 14px 20px;
+            border-radius: 60px;
+            border: 2px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            background: #fefefe;
+            margin-bottom: 20px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 0 3px rgba(236,72,153,0.2);
+        }
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #ec4899);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        .subhead {
+            color: #475569;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            color: #64748b;
+        }
+        @media (max-width: 680px) {
+            .card { padding: 20px; }
+            .radio-option { flex: 1 0 100%; }
+            .passage-box { max-height: 220px; }
+            .timer-submit-row { flex-direction: column; align-items: stretch; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="card">
+        <div class="logos-container">
+            <img src="neu-logo.png" class="logo" id="logo-neu" alt="logo" onerror="this.style.display='none'">
+            <img src="lights-logo.png" class="logo" id="logo-lights" alt="logo" onerror="this.style.display='none'">
+        </div>
+        <h1>📰 Grade 9 Reading Comprehension</h1>
+        <div class="subhead">"How We Read Newspapers" – Reading Habits</div>
+        <p style="margin-bottom: 16px;">Teacher: Mr. Ali Misbah</p>
+        <p style="margin-bottom: 12px; background:#fce7f3; padding:8px 16px; border-radius:40px; display:inline-block;">⏱️ Time limit: 20 minutes</p>
+        <input type="text" id="student-name" placeholder="Enter your full name" autocomplete="off">
+        <br>
+        <button class="btn-main" onclick="initiateQuiz()">✨ Start Quiz ✨</button>
+    </div>
+
+    <!-- QUIZ SCREEN (with timer and submit) -->
+    <div id="quiz-screen" class="card">
+        <div class="logos-container" style="margin-bottom: 8px;">
+            <div style="font-weight:800; background:#fce7f3; padding:5px 15px; border-radius:40px;">📖 Read & Answer</div>
+            <div style="font-size:0.8rem;">🎯 Mr. Ali Misbah</div>
+        </div>
+
+        <!-- Reading Passage -->
+        <div class="passage-box">
+            <p>We know that editors have organized newspapers well for readers with the most important stories on page one with big headlines and stories of lesser importance somewhere in the back of the newspapers. That isn't the way that we read them though.</p>
+            <p>I come to work on a train most mornings, with a lot of other people, all of whom are reading newspapers. We have about an hour, but an editor would be discouraged to see how we go about reading the paper. We don't follow his directions at all. We all look at the headlines quickly- we don't read the front-page stories unless we have time to come back to them later. We go directly to the articles that interest us most. Of course, there are a few people who do it right. They are often the most successful-looking people on the train. They read the important stories first and then go on to the other one.</p>
+            <p>Other newspaper readers on the train buy a good newspaper, take out their glasses and pencils, and turn immediately to the crossword puzzle. It takes them an hour to finish the puzzle, and I don't think that many of them ever look at anything else in the paper.</p>
+            <p>The way we read newspapers is what gives papers their edge over TV. Unlike TV, with newspapers, the reader is in charge. We can read our newspaper frontward or backward. We can skip what bores us and read the parts that we like. We can study the advertisement that interests us and <strong>ignore</strong> what doesn't.</p>
+        </div>
+        
+        <!-- Timer and Submit -->
+        <div class="timer-submit-row">
+            <div class="timer-box">⏱️ Time left: <span id="timer-display">20:00</span></div>
+            <button class="submit-btn" id="submit-quiz-btn" onclick="submitQuiz()">📥 Submit Answers</button>
+        </div>
+
+        <div id="questions-container" class="questions-grid"></div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="card">
+        <div style="font-size: 70px; text-align:center;">🏆</div>
+        <h1 id="rank-slot" style="text-align:center;">Reading Analyst</h1>
+        <h2 id="final-score" style="text-align:center; margin: 10px 0;"></h2>
+        <div class="result-buttons">
+            <button class="btn-main" onclick="downloadCertificate()" style="background:#0f172a;">📜 Download Certificate</button>
+            <button class="btn-main btn-secondary" onclick="resetFullQuiz()">🔄 Try Again</button>
+        </div>
+    </div>
+</div>
+
+<audio id="alarm-sound" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+<audio id="snd-win" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+<script>
+    const { jsPDF } = window.jspdf;
+    
+    // ======================= GRADE 9 READING QUESTIONS =======================
+    const QUESTIONS = [
+        { id: 0, text: "1. The best title of the passage is:", options: ["What People Do on Trains", "Why Newspapers Are Important", "How People Read Newspapers", "How People Solve Crossword Puzzles"], correct: 2 },
+        { id: 1, text: "2. The underlined word 'ignore' in the last paragraph means:", options: ["neglect", "seek", "achieve", "lead"], correct: 0 },
+        { id: 2, text: "3. The underlined word 'them' in the 1st paragraph refers to:", options: ["editors", "stories", "headlines", "newspapers"], correct: 1 },
+        { id: 3, text: "4. According to the 3rd paragraph, the writer thinks that many of those who do crossword puzzles:", options: ["always read everything else that there in a newspaper.", "rarely read anything else that there in a newspaper.", "are not that smart because they take too long doing puzzles.", "should read a newspaper backward, not frontward."], correct: 1 },
+        { id: 4, text: "5. According to the last paragraph, all the following statements are TRUE EXCEPT:", options: ["Readers can read the parts they like in newspapers.", "Readers can skip advertisements that interest them.", "Readers can skip the parts that bore them in newspapers.", "Readers can read newspapers either frontward or backward."], correct: 1 },
+        { id: 5, text: "6. The purpose of the writer is to:", options: ["persuade us to read newspapers.", "entertain us with a story about newspapers.", "inform us of the different ways people read newspapers.", "explain to us how editors organise newspapers."], correct: 2 },
+        { id: 6, text: "7. How do the most successful-looking people read newspapers?", options: ["They read the important stories first and then go on to the other one.", "They look at the headlines quickly and skip front-page stories.", "They turn immediately to the crossword puzzle."], correct: 0 },
+        { id: 7, text: "8. Where, in a newspaper, would you look for important news and stories?", options: ["On page one with big headlines.", "Somewhere in the back of the newspapers.", "In the advertisements section."], correct: 0 }
+    ];
+    const TOTAL_QS = QUESTIONS.length;
+    
+    let studentName = "";
+    let userSelections = new Array(TOTAL_QS).fill(null);
+    let timerInterval = null;
+    let timeLeftSeconds = 20 * 60;
+    let quizActive = true;
+    
+    // DOM elements
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const questionsContainer = document.getElementById('questions-container');
+    const timerDisplaySpan = document.getElementById('timer-display');
+    
+    // Render questions as radio groups (allows changing answers)
+    function renderQuestions() {
+        if (!questionsContainer) return;
+        questionsContainer.innerHTML = "";
+        
+        QUESTIONS.forEach((q, idx) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = q.text;
+            card.appendChild(qText);
+            
+            const optsDiv = document.createElement('div');
+            optsDiv.className = 'options-area';
+            const groupName = `q${q.id}`;
+            
+            q.options.forEach((opt, optIdx) => {
+                const radioId = `${groupName}_${optIdx}`;
+                const radioDiv = document.createElement('div');
+                radioDiv.className = 'radio-option';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = groupName;
+                radio.value = optIdx;
+                radio.id = radioId;
+                if (userSelections[q.id] === optIdx) radio.checked = true;
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) userSelections[q.id] = optIdx;
+                });
+                
+                const label = document.createElement('label');
+                label.htmlFor = radioId;
+                label.innerText = `${String.fromCharCode(97+optIdx)}) ${opt}`;
+                
+                radioDiv.appendChild(radio);
+                radioDiv.appendChild(label);
+                optsDiv.appendChild(radioDiv);
+            });
+            card.appendChild(optsDiv);
+            questionsContainer.appendChild(card);
+        });
+    }
+    
+    // Timer logic
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (!quizActive) return;
+            if (timeLeftSeconds <= 0) {
+                clearInterval(timerInterval);
+                const alarm = document.getElementById('alarm-sound');
+                if (alarm) alarm.play().catch(e=>console.log);
+                alert("⏰ Time is up! Your answers will be submitted automatically.");
+                submitQuiz(true);
+            } else {
+                timeLeftSeconds--;
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+    
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeftSeconds / 60);
+        const seconds = timeLeftSeconds % 60;
+        timerDisplaySpan.innerText = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        if (timeLeftSeconds <= 0) timerDisplaySpan.style.color = "#ef4444";
+    }
+    
+    // Submit quiz (manual or auto)
+    function submitQuiz(isAuto = false) {
+        if (!quizActive) return;
+        if (!isAuto) {
+            const confirmSubmit = confirm("Are you sure you want to submit your answers? You cannot change them after submission.");
+            if (!confirmSubmit) return;
+        }
+        if (timerInterval) clearInterval(timerInterval);
+        quizActive = false;
+        
+        let correctCount = 0;
+        for (let i = 0; i < TOTAL_QS; i++) {
+            if (userSelections[i] !== null && userSelections[i] === QUESTIONS[i].correct) {
+                correctCount++;
+            }
+        }
+        const scorePercent = Math.round((correctCount / TOTAL_QS) * 100);
+        let rankText = "";
+        if (correctCount === TOTAL_QS) rankText = "🏆 PERFECT READER 🏆";
+        else if (correctCount >= 6) rankText = "🌟 Insightful Analyst 🌟";
+        else rankText = "📖 Keep Exploring!";
+        
+        document.getElementById('rank-slot').innerHTML = rankText;
+        document.getElementById('final-score').innerHTML = `🎯 Score: ${correctCount} / ${TOTAL_QS}  (${scorePercent}%)`;
+        
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'block';
+        
+        const winSound = document.getElementById('snd-win');
+        if (winSound) winSound.play().catch(e=>console.log);
+        canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6 }, colors: ['#ec4899', '#db2777', '#f59e0b'] });
+    }
+    
+    function initiateQuiz() {
+        const nameInput = document.getElementById('student-name');
+        const rawName = nameInput.value.trim();
+        if (rawName === "") {
+            alert("📛 Please enter your name to begin.");
+            return;
+        }
+        studentName = rawName;
+        userSelections = new Array(TOTAL_QS).fill(null);
+        timeLeftSeconds = 20 * 60;
+        quizActive = true;
+        updateTimerDisplay();
+        renderQuestions();
+        startTimer();
+        
+        welcomeScreen.style.display = 'none';
+        quizScreen.style.display = 'block';
+        resultScreen.style.display = 'none';
+        if (questionsContainer) questionsContainer.scrollTop = 0;
+    }
+    
+    function resetFullQuiz() {
+        if (timerInterval) clearInterval(timerInterval);
+        studentName = "";
+        userSelections = new Array(TOTAL_QS).fill(null);
+        quizActive = false;
+        const nameField = document.getElementById('student-name');
+        if (nameField) nameField.value = "";
+        welcomeScreen.style.display = 'block';
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'none';
+    }
+    
+    function downloadCertificate() {
+        if (!studentName) {
+            const fallback = document.getElementById('student-name')?.value.trim();
+            if (fallback) studentName = fallback;
+            else studentName = "Curious Reader";
+        }
+        let finalCorrect = 0;
+        for (let i = 0; i < TOTAL_QS; i++) {
+            if (userSelections[i] !== null && userSelections[i] === QUESTIONS[i].correct) finalCorrect++;
+        }
+        const percentScore = Math.round((finalCorrect / TOTAL_QS) * 100);
+        
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const w = 297, h = 210;
+        doc.setFillColor(255, 241, 242);
+        doc.rect(0, 0, w, h, 'F');
+        doc.setDrawColor(236, 72, 153);
+        doc.setLineWidth(2.5);
+        doc.rect(10, 10, w - 20, h - 20);
+        
+        doc.setFillColor(252, 231, 243, 0.3);
+        doc.circle(40, 40, 20, 'F');
+        doc.circle(260, 170, 25, 'F');
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(32);
+        doc.setTextColor(30, 41, 59);
+        doc.text("CERTIFICATE OF ACHIEVEMENT", w/2, 55, { align: "center" });
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(18);
+        doc.setTextColor(71, 85, 105);
+        doc.text("This certificate is proudly presented to", w/2, 80, { align: "center" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(36);
+        doc.setTextColor(236, 72, 153);
+        doc.text(studentName.toUpperCase(), w/2, 110, { align: "center" });
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(16);
+        doc.setTextColor(51, 65, 85);
+        doc.text(`for outstanding performance in the Grade 9 Reading Comprehension Quiz`, w/2, 135, { align: "center" });
+        doc.text(`"How We Read Newspapers"`, w/2, 150, { align: "center" });
+        
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(22, 163, 74);
+        doc.text(`Score: ${finalCorrect} / ${TOTAL_QS}  ·  ${percentScore}%`, w/2, 172, { align: "center" });
+        
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, w/2, 190, { align: "center" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Mr. Ali Misbah", w/2, 202, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.text("English Language Instructor", w/2, 208, { align: "center" });
+        
+        doc.save(`${studentName.replace(/\s/g, "_")}_Grade9_Reading_Certificate.pdf`);
+    }
+    
+    window.initiateQuiz = initiateQuiz;
+    window.submitQuiz = submitQuiz;
+    window.resetFullQuiz = resetFullQuiz;
+    window.downloadCertificate = downloadCertificate;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTimerDisplay();
+    });
+</script>
+</body>
+</html>
