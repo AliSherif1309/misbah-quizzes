@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Grade 8 Reading Comprehension | The Importance of Sleep – Timed Quiz</title>
+    <title>Grade 8 Reading Comprehension | The Importance of Sleep – Timed Quiz with Inline Review</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -42,7 +42,7 @@
             border: 1px solid rgba(255,255,255,0.6);
         }
 
-        #quiz-screen, #result-screen {
+        #quiz-screen {
             display: none;
         }
 
@@ -120,6 +120,22 @@
             transform: translateY(-2px);
             filter: brightness(1.02);
         }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .score-badge {
+            background: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
 
         .questions-grid {
             display: flex;
@@ -163,7 +179,7 @@
             cursor: pointer;
             transition: all 0.12s;
         }
-        .radio-option:hover {
+        .radio-option:hover:not(.disabled-option) {
             background: #eef2ff;
             border-color: #cbd5e1;
             transform: scale(0.98);
@@ -183,7 +199,19 @@
             cursor: pointer;
             flex: 1;
         }
-
+        /* Correct / Wrong highlight styles */
+        .radio-option.correct-highlight {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+        }
+        .radio-option.wrong-highlight {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+        }
+        .status-icon {
+            margin-left: 8px;
+            font-weight: bold;
+        }
         .btn-main {
             background: linear-gradient(105deg, #6366f1, #4f46e5);
             color: white;
@@ -205,6 +233,13 @@
             background: #334155;
             box-shadow: none;
         }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
         input[type="text"] {
             width: 85%;
             padding: 14px 20px;
@@ -220,13 +255,6 @@
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
-        }
-        .result-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 18px;
-            margin-top: 28px;
-            flex-wrap: wrap;
         }
         h1 {
             font-size: 1.9rem;
@@ -273,7 +301,7 @@
         <button class="btn-main" onclick="initiateQuiz()">✨ Start Quiz ✨</button>
     </div>
 
-    <!-- QUIZ SCREEN (with timer and submit) -->
+    <!-- QUIZ SCREEN (with timer, submit, and inline review after submission) -->
     <div id="quiz-screen" class="card">
         <div class="logos-container" style="margin-bottom: 8px;">
             <div style="font-weight:800; background:#e0e7ff; padding:5px 15px; border-radius:40px;">📖 Read & Answer</div>
@@ -295,23 +323,26 @@
             <button class="submit-btn" id="submit-quiz-btn" onclick="submitQuiz()">📥 Submit Answers</button>
         </div>
 
-        <div id="questions-container" class="questions-grid"></div>
-    </div>
+        <!-- Score display after submission (initially hidden) -->
+        <div id="score-area" style="text-align: center; margin-bottom: 20px; display: none;">
+            <div class="score-badge" id="score-badge"></div>
+        </div>
 
-    <!-- RESULT SCREEN -->
-    <div id="result-screen" class="card">
-        <div style="font-size: 70px; text-align:center;">🏆</div>
-        <h1 id="rank-slot" style="text-align:center;">Sleep Scholar</h1>
-        <h2 id="final-score" style="text-align:center; margin: 10px 0;"></h2>
-        <div class="result-buttons">
+        <div id="questions-container" class="questions-grid"></div>
+        
+        <!-- Action buttons after submission -->
+        <div id="post-submit-buttons" class="action-buttons" style="margin-top: 20px; display: none;">
             <button class="btn-main" onclick="downloadCertificate()" style="background:#0f172a;">📜 Download Certificate</button>
             <button class="btn-main btn-secondary" onclick="resetFullQuiz()">🔄 Try Again</button>
         </div>
     </div>
 </div>
 
+<!-- Audio effects -->
 <audio id="alarm-sound" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 <audio id="snd-win" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+<audio id="snd-good" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-low" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
 
 <script>
     const { jsPDF } = window.jspdf;
@@ -334,15 +365,18 @@
     let timerInterval = null;
     let timeLeftSeconds = 20 * 60;
     let quizActive = true;
+    let submitted = false;
     
     // DOM elements
     const welcomeScreen = document.getElementById('welcome-screen');
     const quizScreen = document.getElementById('quiz-screen');
-    const resultScreen = document.getElementById('result-screen');
     const questionsContainer = document.getElementById('questions-container');
     const timerDisplaySpan = document.getElementById('timer-display');
+    const submitBtn = document.getElementById('submit-quiz-btn');
+    const scoreArea = document.getElementById('score-area');
+    const postSubmitButtons = document.getElementById('post-submit-buttons');
     
-    // Render questions as radio groups (allows changing answers)
+    // Render questions as radio groups (allows changing answers before submission)
     function renderQuestions() {
         if (!questionsContainer) return;
         questionsContainer.innerHTML = "";
@@ -363,6 +397,7 @@
                 const radioId = `${groupName}_${optIdx}`;
                 const radioDiv = document.createElement('div');
                 radioDiv.className = 'radio-option';
+                if (submitted) radioDiv.classList.add('disabled-option');
                 
                 const radio = document.createElement('input');
                 radio.type = 'radio';
@@ -370,13 +405,33 @@
                 radio.value = optIdx;
                 radio.id = radioId;
                 if (userSelections[q.id] === optIdx) radio.checked = true;
+                if (submitted) radio.disabled = true;
                 radio.addEventListener('change', (e) => {
-                    if (e.target.checked) userSelections[q.id] = optIdx;
+                    if (!submitted && e.target.checked) userSelections[q.id] = optIdx;
                 });
                 
                 const label = document.createElement('label');
                 label.htmlFor = radioId;
                 label.innerText = `${String.fromCharCode(97+optIdx)}) ${opt}`;
+                
+                // If submitted, highlight correct/wrong
+                if (submitted) {
+                    const isChosen = (userSelections[q.id] === optIdx);
+                    const isCorrectOption = (optIdx === q.correct);
+                    if (isChosen && isCorrectOption) {
+                        radioDiv.classList.add('correct-highlight');
+                        const icon = document.createElement('span');
+                        icon.className = 'status-icon';
+                        icon.innerText = ' ✓';
+                        label.appendChild(icon);
+                    } else if (isChosen && !isCorrectOption) {
+                        radioDiv.classList.add('wrong-highlight');
+                        const icon = document.createElement('span');
+                        icon.className = 'status-icon';
+                        icon.innerText = ' ✗';
+                        label.appendChild(icon);
+                    }
+                }
                 
                 radioDiv.appendChild(radio);
                 radioDiv.appendChild(label);
@@ -391,7 +446,7 @@
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
-            if (!quizActive) return;
+            if (!quizActive || submitted) return;
             if (timeLeftSeconds <= 0) {
                 clearInterval(timerInterval);
                 const alarm = document.getElementById('alarm-sound');
@@ -412,16 +467,34 @@
         if (timeLeftSeconds <= 0) timerDisplaySpan.style.color = "#ef4444";
     }
     
+    // Play score-based sound
+    function playScoreSound(score, total) {
+        const percent = (score / total) * 100;
+        const winSound = document.getElementById('snd-win');
+        const goodSound = document.getElementById('snd-good');
+        const lowSound = document.getElementById('snd-low');
+        if (score === total) {
+            if (winSound) winSound.play().catch(e=>console.log);
+        } else if (percent >= 70) {
+            if (goodSound) goodSound.play().catch(e=>console.log);
+        } else {
+            if (lowSound) lowSound.play().catch(e=>console.log);
+        }
+    }
+    
     // Submit quiz (manual or auto)
     function submitQuiz(isAuto = false) {
+        if (submitted) return;
         if (!quizActive) return;
         if (!isAuto) {
             const confirmSubmit = confirm("Are you sure you want to submit your answers? You cannot change them after submission.");
             if (!confirmSubmit) return;
         }
+        submitted = true;
         if (timerInterval) clearInterval(timerInterval);
         quizActive = false;
         
+        // Calculate score
         let correctCount = 0;
         for (let i = 0; i < TOTAL_QS; i++) {
             if (userSelections[i] !== null && userSelections[i] === QUESTIONS[i].correct) {
@@ -429,20 +502,33 @@
             }
         }
         const scorePercent = Math.round((correctCount / TOTAL_QS) * 100);
+        
+        // Display score
+        const scoreBadge = document.getElementById('score-badge');
         let rankText = "";
-        if (correctCount === TOTAL_QS) rankText = "🏆 PERFECT SLEEP SCHOLAR 🏆";
-        else if (correctCount >= 6) rankText = "🌟 Health Expert 🌟";
+        if (correctCount === TOTAL_QS) rankText = "🏆 PERFECT SLEEP SCHOLAR! 🏆";
+        else if (correctCount >= 6) rankText = "🌟 Health Expert! 🌟";
         else rankText = "📖 Keep Learning!";
+        scoreBadge.innerHTML = `🎯 Your Score: ${correctCount} / ${TOTAL_QS} (${scorePercent}%)<br>${rankText}`;
+        scoreArea.style.display = 'block';
         
-        document.getElementById('rank-slot').innerHTML = rankText;
-        document.getElementById('final-score').innerHTML = `🎯 Score: ${correctCount} / ${TOTAL_QS}  (${scorePercent}%)`;
+        // Show post-submit buttons
+        postSubmitButtons.style.display = 'flex';
         
-        quizScreen.style.display = 'none';
-        resultScreen.style.display = 'block';
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.6";
         
-        const winSound = document.getElementById('snd-win');
-        if (winSound) winSound.play().catch(e=>console.log);
-        canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6 }, colors: ['#6366f1', '#4f46e5', '#f59e0b'] });
+        // Re-render questions with highlights
+        renderQuestions();
+        
+        // Play sound based on score
+        playScoreSound(correctCount, TOTAL_QS);
+        
+        // Confetti if perfect or high score
+        if (correctCount === TOTAL_QS || correctCount >= 7) {
+            canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6 }, colors: ['#6366f1', '#4f46e5', '#f59e0b'] });
+        }
     }
     
     function initiateQuiz() {
@@ -456,13 +542,20 @@
         userSelections = new Array(TOTAL_QS).fill(null);
         timeLeftSeconds = 20 * 60;
         quizActive = true;
+        submitted = false;
         updateTimerDisplay();
+        
+        // Reset UI
+        scoreArea.style.display = 'none';
+        postSubmitButtons.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        
         renderQuestions();
         startTimer();
         
         welcomeScreen.style.display = 'none';
         quizScreen.style.display = 'block';
-        resultScreen.style.display = 'none';
         if (questionsContainer) questionsContainer.scrollTop = 0;
     }
     
@@ -470,12 +563,14 @@
         if (timerInterval) clearInterval(timerInterval);
         studentName = "";
         userSelections = new Array(TOTAL_QS).fill(null);
+        submitted = false;
         quizActive = false;
         const nameField = document.getElementById('student-name');
         if (nameField) nameField.value = "";
         welcomeScreen.style.display = 'block';
         quizScreen.style.display = 'none';
-        resultScreen.style.display = 'none';
+        scoreArea.style.display = 'none';
+        postSubmitButtons.style.display = 'none';
     }
     
     function downloadCertificate() {
